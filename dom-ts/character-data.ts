@@ -1,0 +1,136 @@
+import { createClone, flatNodes, setParentNode } from "./_utils.ts";
+
+class CharacterDataClass extends dom.Node {
+  #nodeValue: string;
+
+  constructor(data: string, nodeName: string, nodeType: DOM.NodeType) {
+    super(nodeName, nodeType);
+    this.#nodeValue = String(data);
+  }
+
+  [createClone](): DOM.CharacterData {
+    return new dom.CharacterData(this.data, this.nodeName, this.nodeType, null);
+  }
+
+  get length() {
+    return this.data.length;
+  }
+
+  get nodeValue(): string {
+    return this.#nodeValue ?? "";
+  }
+
+  set nodeValue(value: unknown) {
+    this.#nodeValue = String(value ?? "");
+  }
+
+  get data(): string {
+    return this.nodeValue;
+  }
+
+  set data(value: string) {
+    this.nodeValue = value;
+  }
+
+  get textContent(): string {
+    return this.nodeValue;
+  }
+  set textContent(value: string | null) {
+    this.nodeValue = value;
+  }
+
+  appendData(data: string): void {
+    this.data += data;
+  }
+
+  deleteData(offset: number, count: number): void {
+    throw new Error("to-do");
+  }
+  insertData(offset: number, data: string): void {
+    throw new Error("to-do");
+  }
+  replaceData(offset: number, count: number, data: string): void {
+    throw new Error("to-do");
+  }
+  substringData(offset: number, count: number): string {
+    throw new Error("to-do");
+  }
+  after(...nodes: (DOM.Node | string)[]): void {
+    const parentNode = this.parentNode;
+    const thisSiblings = parentNode?.childNodes;
+    if (!thisSiblings) {
+      return;
+    }
+
+    const allNodes = flatNodes(nodes);
+
+    for (const node of allNodes) {
+      const oldSiblings = node.parentNode?.childNodes;
+      if (oldSiblings) {
+        oldSiblings.splice(oldSiblings.indexOf(node), 1);
+      }
+      node[setParentNode](parentNode);
+    }
+
+    const index = thisSiblings.indexOf(this) + 1;
+    if (index === thisSiblings.length) {
+      thisSiblings.push(...allNodes);
+    } else {
+      thisSiblings.splice(index, 0, ...allNodes);
+    }
+  }
+
+  before(...nodes: (DOM.Node | string)[]): void {
+    const parentNode = this.parentNode;
+    const thisSiblings = parentNode?.childNodes;
+    if (!thisSiblings) {
+      return;
+    }
+
+    const allNodes = flatNodes(nodes);
+
+    for (const node of allNodes) {
+      const oldSiblings = node.parentNode?.childNodes;
+      if (oldSiblings) {
+        oldSiblings.splice(oldSiblings.indexOf(node), 1);
+      }
+      node[setParentNode](parentNode);
+    }
+
+    thisSiblings.splice(thisSiblings.indexOf(this), 0, ...allNodes);
+  }
+  remove(): void {
+    this.parentNode?.removeChild(this);
+  }
+  replaceWith(...nodes: (DOM.Node | string)[]): void {
+    const parentNode = this.parentNode;
+    const thisSiblings = parentNode?.childNodes;
+    if (!thisSiblings) {
+      return;
+    }
+
+    const allNodes = flatNodes(nodes);
+
+    for (const node of allNodes) {
+      const oldSiblings = node.parentNode?.childNodes;
+      if (oldSiblings) {
+        oldSiblings.splice(oldSiblings.indexOf(node), 1);
+      }
+      node[setParentNode](parentNode);
+    }
+
+    this[setParentNode](null);
+    thisSiblings.splice(thisSiblings.indexOf(this), 1, ...allNodes);
+  }
+}
+
+globalThis.dom.CharacterData = CharacterDataClass;
+
+declare global {
+  namespace DOM {
+    type CharacterData = CharacterDataClass;
+  }
+  interface DOM {
+    CharacterData: typeof CharacterDataClass;
+  }
+}

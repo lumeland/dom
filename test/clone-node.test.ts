@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { DOMParser, Element, Node } from "../mod.ts";
+import { DOMParser, dom } from "../mod.ts";
 
 describe("Clone node", () => {
   it("cloneNode", () => {
@@ -16,11 +16,11 @@ describe("Clone node", () => {
 
     checkClone(doc, doc.cloneNode(true));
 
-    function checkClone(node: Node, clone: Node) {
-      expect(clone).toBeInstanceOf(Node);
+    function checkClone(node: DOM.Node, clone: DOM.Node) {
+      expect(clone).toBeInstanceOf(dom.Node);
       expect(node).not.toBe(clone);
-      if (node instanceof Element) {
-        expect((node as Element).outerHTML).toBe((clone as Element).outerHTML);
+      if (node instanceof dom.Element) {
+        expect(node.outerHTML).toBe((clone as DOM.Element).outerHTML);
       } else {
         expect(node.nodeName).toBe(clone.nodeName);
         expect(node.nodeValue).toBe(clone.nodeValue);
@@ -46,14 +46,8 @@ describe("Clone node", () => {
     const div2 = doc.querySelector("#baz")!;
     const div3 = doc.querySelector("#fizz")!;
 
-    expect(div1.getAttributeNames()).toStrictEqual(
-      (div1.cloneNode() as Element).getAttributeNames(),
-    );
-    expect(div2.getAttributeNames()).toStrictEqual(
-      (div2.cloneNode() as Element).getAttributeNames(),
-    );
-    expect(div3.getAttributeNames()).toStrictEqual(
-      (div3.cloneNode() as Element).getAttributeNames(),
-    );
+    expect(div1.getAttributeNames()).toStrictEqual(div1.cloneNode().getAttributeNames());
+    expect(div2.getAttributeNames()).toStrictEqual(div2.cloneNode().getAttributeNames());
+    expect(div3.getAttributeNames()).toStrictEqual(div3.cloneNode().getAttributeNames());
   });
 });

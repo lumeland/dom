@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { Document, DOMParser } from "../mod.ts";
+import { dom, DOMParser } from "../mod.ts";
 
 describe("Document clone", () => {
   it("Document.cloneNode has non-null .body & .head when they exist", () => {
@@ -9,7 +9,7 @@ describe("Document clone", () => {
     expect(docClone.body?.localName).toBe("body");
     expect(docClone.head?.localName).toBe("head");
 
-    const emptyDoc = new Document();
+    const emptyDoc = new dom.Document();
     const emptyDocClone = emptyDoc.cloneNode(true);
 
     expect(emptyDocClone.body).toBe(null);

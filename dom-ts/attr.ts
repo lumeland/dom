@@ -1,11 +1,15 @@
-import { Node, NodeTypes } from "./node.ts";
+import { createClone } from "./_utils.ts";
 
-export class Attr extends Node implements globalThis.Attr {
+class AttrClass extends dom.Node {
   value: string;
 
-  constructor(name: string, value: string, parentNode: Node | null) {
-    super(name, NodeTypes.ATTRIBUTE_NODE, parentNode);
+  constructor(name: string, value: string) {
+    super(name, dom.NodeType.ATTRIBUTE_NODE);
     this.value = value;
+  }
+
+  [createClone](): DOM.Attr {
+    return new dom.Attr(this.name, this.value);
   }
 
   get localName(): string {
@@ -17,10 +21,10 @@ export class Attr extends Node implements globalThis.Attr {
   get namespaceURI(): string | null {
     throw new Error("to-do");
   }
-  get ownerDocument(): Document {
+  get ownerDocument(): DOM.Document {
     throw new Error("to-do");
   }
-  get ownerElement(): Element | null {
+  get ownerElement(): DOM.Element | null {
     throw new Error("to-do");
   }
   get prefix(): string | null {
@@ -35,19 +39,30 @@ export class Attr extends Node implements globalThis.Attr {
   set textContent(value: string | null) {
     this.value = value ?? "";
   }
-  override appendChild<T extends globalThis.Node>(): T {
+  override appendChild<T extends DOM.Node>(): T {
     throw new DOMException("Cannot add children to an Attribute");
   }
 
-  override replaceChild<T extends globalThis.Node>(): T {
+  override replaceChild<T extends DOM.Node>(): T {
     throw new DOMException("Cannot add children to an Attribute");
   }
 
-  override insertBefore<T extends globalThis.Node>(): T {
+  override insertBefore<T extends DOM.Node>(): T {
     throw new DOMException("Cannot add children to an Attribute");
   }
 
-  override removeChild<T extends globalThis.Node>(): T {
+  override removeChild<T extends DOM.Node>(): T {
     throw new DOMException("The node to be removed is not a child of this node");
+  }
+}
+
+globalThis.dom.Attr = AttrClass;
+
+declare global {
+  namespace DOM {
+    type Attr = AttrClass;
+  }
+  interface DOM {
+    Attr: typeof AttrClass;
   }
 }

@@ -1,12 +1,11 @@
 import { describe, it, expect } from "vitest";
-import { Comment, DOMParser, NodeType, Text } from "../mod.ts";
+import { dom, DOMParser } from "../mod.ts";
 
 describe("Charater data", () => {
   it("CharacterData.nodeValue/data", () => {
     const doc = new DOMParser().parseFromString(`foo<!--bar-->`, "text/html");
-
-    const text = doc.body?.childNodes[0] as Text;
-    const comment = doc.body?.childNodes[1] as Comment;
+    const text = doc.body?.childNodes[0] as DOM.Text;
+    const comment = doc.body?.childNodes[1] as DOM.Comment;
 
     expect(text.nodeValue).toBe("foo");
     expect(text.nodeValue).toBe(text.data);
@@ -37,12 +36,12 @@ describe("Charater data", () => {
   });
 
   it("Text/Comment constructors with non-strings", () => {
-    const textNull = new Text(null as any);
-    const commentNull = new Comment(null as any);
-    const textObject = new Text({} as any);
-    const commentObject = new Comment({} as any);
-    const textZero = new Text(0 as any);
-    const commentZero = new Comment(0 as any);
+    const textNull = new dom.Text(null as any);
+    const commentNull = new dom.Comment(null as any);
+    const textObject = new dom.Text({} as any);
+    const commentObject = new dom.Comment({} as any);
+    const textZero = new dom.Text(0 as any);
+    const commentZero = new dom.Comment(0 as any);
 
     expect(textNull.nodeValue).toBe("null");
     expect(textNull.data).toBe("null");
@@ -69,28 +68,28 @@ describe("Charater data", () => {
   it("CharacterData.after/before/remove/replaceWith", () => {
     const doc = new DOMParser().parseFromString(`foo<!--bar-->`, "text/html");
 
-    const text = doc.body?.childNodes[0] as Text;
-    const comment = doc.body?.childNodes[1] as Comment;
+    const text = doc.body?.childNodes[0] as DOM.Text;
+    const comment = doc.body?.childNodes[1] as DOM.Comment;
 
     expect(doc.body?.childNodes.length).toBe(2);
     expect((text as any).previousSibling).toBe(null);
 
-    text.before(new Comment("fizz"));
+    text.before(new dom.Comment("fizz"));
 
     expect(doc.body?.childNodes[0].nodeValue).toBe("fizz");
     expect(doc.body?.childNodes.length).toBe(3);
     expect(text.previousSibling?.nodeValue).toBe("fizz");
-    expect(text.previousSibling?.nodeType).toBe(NodeType.COMMENT_NODE);
+    expect(text.previousSibling?.nodeType).toBe(dom.NodeType.COMMENT_NODE);
     expect(text.nextSibling?.nodeValue).toBe("bar");
-    expect(text.nextSibling?.nodeType).toBe(NodeType.COMMENT_NODE);
+    expect(text.nextSibling?.nodeType).toBe(dom.NodeType.COMMENT_NODE);
 
-    text.after(new Text(" extra"));
+    text.after(new dom.Text(" extra"));
 
     expect(doc.body?.childNodes[2].nodeValue).toBe(" extra");
     expect(doc.body?.childNodes.length).toBe(4);
     expect(doc.body?.outerHTML).toBe(`<body><!--fizz-->foo extra<!--bar--></body>`);
     expect(text.nextSibling?.nodeValue).toBe(" extra");
-    expect(text.nextSibling?.nodeType).toBe(NodeType.TEXT_NODE);
+    expect(text.nextSibling?.nodeType).toBe(dom.NodeType.TEXT_NODE);
 
     const div = doc.createElement("div");
     div.innerHTML = "html";
@@ -101,8 +100,8 @@ describe("Charater data", () => {
       `<body><!--fizz-->stuff<div>html</div> extra<!--bar--></body>`,
     );
     expect(div.nextSibling?.nodeValue).toBe(" extra");
-    expect(text.parentNode).toBe(null);
-    expect(text.parentElement).toBe(null);
+    expect(text.parentNode).toBeNull();
+    expect(text.parentElement).toBeNull();
     expect(div.previousSibling?.nodeValue).toBe("stuff");
     expect(div.nextSibling?.nodeValue).toBe(" extra");
     expect(div.nextSibling?.nextSibling).toBe(comment);
@@ -110,11 +109,11 @@ describe("Charater data", () => {
     comment.remove();
 
     expect(doc.body?.childNodes.length).toBe(4);
-    expect(div.nextSibling?.nextSibling).toBe(null);
-    expect(comment.parentNode).toBe(null);
-    expect(comment.parentElement).toBe(null);
-    expect(comment.previousSibling).toBe(null);
-    expect(comment.nextSibling).toBe(null);
+    expect(div.nextSibling!.nextSibling).toBeNull();
+    expect(comment.parentNode).toBeNull();
+    expect(comment.parentElement).toBeNull();
+    expect(comment.previousSibling).toBeNull();
+    expect(comment.nextSibling).toBeNull();
   });
 
   it("CharacterData.textContent", () => {

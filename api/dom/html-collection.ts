@@ -95,7 +95,7 @@ export interface HTMLCollection {
   readonly length: number;
   [Symbol.iterator](): Generator<Element>;
 
-  new(): HTMLCollection;
+  new (): HTMLCollection;
   item(index: number): Element;
   [HTMLCollectionMutatorSym](): HTMLCollectionMutator;
 }

@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { Comment, DocumentFragment, DOMParser, Element, Node, Text } from "../mod.ts";
+import { DOMParser, dom } from "../mod.ts";
 
 describe("Document fragment", () => {
   it("DocumentFragment", () => {
@@ -11,13 +11,13 @@ describe("Document fragment", () => {
     );
 
     const parent = doc.querySelector("#parent")!;
-    const frag = new DocumentFragment();
+    const frag = new dom.DocumentFragment();
     const frag2 = doc.createDocumentFragment();
-    frag.append("foo", new Comment("bar"), doc.createElement("img"));
+    frag.append("foo", new dom.Comment("bar"), doc.createElement("img"));
 
     expect(frag.childNodes.length).toBe(3);
     expect(frag.children.length).toBe(1);
-    expect(frag.childNodes[0].nodeType).toBe(Node.TEXT_NODE);
+    expect(frag.childNodes[0].nodeType).toBe(dom.Node.TEXT_NODE);
     expect(frag.childNodes[1].nodeValue).toBe("bar");
 
     parent.appendChild(frag);
@@ -26,11 +26,11 @@ describe("Document fragment", () => {
     expect(frag.parentElement).toBe(null);
     expect(frag.childNodes.length).toBe(0);
     expect(parent.childNodes.length).toBe(3);
-    expect(parent.childNodes[0].nodeType).toBe(Node.TEXT_NODE);
+    expect(parent.childNodes[0].nodeType).toBe(dom.Node.TEXT_NODE);
     expect(parent.childNodes[1].nodeValue).toBe("bar");
 
     frag2.appendChild(doc.createElement("aside"));
-    frag2.append(doc.createElement("p"), doc.createElement("button"), new Text("fizz"));
+    frag2.append(doc.createElement("p"), doc.createElement("button"), new dom.Text("fizz"));
     frag2.prepend(doc.createElement("div"));
 
     const newChildrenHtml = `
@@ -46,7 +46,7 @@ describe("Document fragment", () => {
     frag2.lastElementChild!.innerHTML = newChildrenHtml;
 
     expect(frag2.childNodes.length).toBe(5);
-    expect((frag2.childNodes[0] as Element).tagName).toBe("DIV");
+    expect((frag2.childNodes[0] as DOM.Element).tagName).toBe("DIV");
     expect(frag2.children.length).toBe(4);
     expect(frag2.querySelector(".a .this-img[foo=bar]")?.tagName).toBe("IMG");
 
@@ -62,8 +62,8 @@ describe("Document fragment", () => {
     parent.children[0].before(frag);
 
     expect(parent.childNodes.length).toBe(8);
-    expect((parent.childNodes[2] as Element).tagName).toBe("DIV");
-    expect((parent.childNodes[3] as Element).tagName).toBe("ASIDE");
+    expect((parent.childNodes[2] as DOM.Element).tagName).toBe("DIV");
+    expect((parent.childNodes[3] as DOM.Element).tagName).toBe("ASIDE");
     expect(parent.querySelector(".a .this-img")?.tagName).toBe("IMG");
 
     parent.after(frag);
@@ -104,14 +104,14 @@ describe("Document fragment", () => {
     const div = doc.querySelector("div")!;
     frag.append(div);
 
-    const shallowFragClone = frag.cloneNode() as DocumentFragment;
+    const shallowFragClone = frag.cloneNode() as DOM.DocumentFragment;
 
     expect(shallowFragClone.childNodes.length).toBe(0);
     expect(shallowFragClone.children.length).toBe(0);
     expect(shallowFragClone.querySelectorAll("*").length).toBe(0);
     expect(frag).not.toBe(shallowFragClone);
 
-    const deepFragClone = frag.cloneNode(true) as DocumentFragment;
+    const deepFragClone = frag.cloneNode(true) as DOM.DocumentFragment;
 
     expect(deepFragClone.childNodes.length).toBe(1);
     expect(deepFragClone.children.length).toBe(1);

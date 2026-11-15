@@ -1,9 +1,9 @@
 import { describe, it, expect } from "vitest";
-import { Comment, Document } from "../mod.ts";
+import { dom } from "../mod.ts";
 
 describe("Child element count", () => {
   it("Element.childElementCount with three children", () => {
-    const document = new Document();
+    const document = new dom.Document();
     const list = document.createElement("ul");
     for (let i = 0; i < 3; i++) {
       list.appendChild(document.createElement("li"));
@@ -12,15 +12,15 @@ describe("Child element count", () => {
   });
 
   it("Element.childElementCount with non-node", () => {
-    const document = new Document();
+    const document = new dom.Document();
     const divider = document.createElement("div");
     divider.appendChild(document.createElement("p"));
-    divider.appendChild(new Comment());
+    divider.appendChild(new dom.Comment());
     expect(divider.childElementCount).toBe(1);
   });
 
   it("Document.childElementCount with three children", () => {
-    const document = new Document();
+    const document = new dom.Document();
     for (let i = 0; i < 3; i++) {
       document.appendChild(document.createElement("ul"));
     }
@@ -28,9 +28,9 @@ describe("Child element count", () => {
   });
 
   it("Element.childElementCount with non-node", () => {
-    const document = new Document();
+    const document = new dom.Document();
     document.appendChild(document.createElement("p"));
-    document.appendChild(new Comment());
+    document.appendChild(new dom.Comment());
     expect(document.childElementCount).toBe(1);
   });
 });

@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { Comment, Document, DocumentType, DOMParser, Element, Node } from "../mod.ts";
+import { dom, DOMParser } from "../mod.ts";
 
 const src = `<!-- A popular English-language nursery rhyme. -->
 <!doctype html>
@@ -23,18 +23,18 @@ describe("Comments outside HTML", () => {
   it("Comment before <html>", async () => {
     const document = new DOMParser().parseFromString(src, "text/html");
 
-    expect(document).toBeInstanceOf(Document);
+    expect(document).toBeInstanceOf(dom.Document);
     expect(document.childNodes.length).toBe(5);
-    expect(document.childNodes[0]).toBeInstanceOf(Comment);
-    expect((document.childNodes[0] as Comment).data).toBe(
+    expect(document.childNodes[0]).toBeInstanceOf(dom.Comment);
+    expect((document.childNodes[0] as DOM.Comment).data).toBe(
       " A popular English-language nursery rhyme. ",
     );
-    expect(document.childNodes[1]).toBeInstanceOf(DocumentType);
-    expect(document.childNodes[2]).toBeInstanceOf(Comment);
-    expect((document.childNodes[2] as Comment).data).toBe(" TODO: Bells and whistles ");
-    expect(document.childNodes[3]).toBeInstanceOf(Element);
-    expect(document.documentElement as Node | null).toBe(document.childNodes[3]);
-    expect(document.childNodes[4]).toBeInstanceOf(Comment);
-    expect((document.childNodes[4] as Comment).data).toBe(" Copyright: public domain ");
+    expect(document.childNodes[1]).toBeInstanceOf(dom.DocumentType);
+    expect(document.childNodes[2]).toBeInstanceOf(dom.Comment);
+    expect((document.childNodes[2] as DOM.Comment).data).toBe(" TODO: Bells and whistles ");
+    expect(document.childNodes[3]).toBeInstanceOf(dom.Element);
+    expect(document.documentElement as DOM.Node | null).toBe(document.childNodes[3]);
+    expect(document.childNodes[4]).toBeInstanceOf(dom.Comment);
+    expect((document.childNodes[4] as DOM.Comment).data).toBe(" Copyright: public domain ");
   });
 });

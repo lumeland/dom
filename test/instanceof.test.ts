@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { Element, HTMLCollection, NodeList, nodesFromString } from "../mod.ts";
+import { DOMParser } from "../mod.ts";
 
 const basicHtml = `<!doctype html>
 <html class="dark">
@@ -16,22 +16,24 @@ const basicHtml = `<!doctype html>
 </html>
 `;
 
+const parser = new DOMParser();
+
 describe("Instances", () => {
   it("Array instanceof Array", () => {
     expect([]).toBeInstanceOf(Array);
     expect(Array.isArray([])).toBeTruthy();
   });
 
-  it("NodeList not instanceof Array", () => {
-    const nodes = nodesFromString(basicHtml);
-    expect(nodes).not.toBeInstanceOf(Array);
+  it("NodeList is instanceof Array", () => {
+    const nodes = parser.parseFromString(basicHtml, "text/html");
+    expect(nodes.childNodes).toBeInstanceOf(Array);
     expect(Array.isArray(nodes)).toBeFalsy();
   });
 
-  it("HTMLCollection not instanceof Array", () => {
-    const nodes = nodesFromString(basicHtml);
-    expect((nodes as Element).children).not.toBeInstanceOf(Array);
-    expect(Array.isArray((nodes as Element).children)).toBeFalsy();
+  it("HTMLCollection is instanceof Array", () => {
+    const nodes = parser.parseFromString(basicHtml, "text/html");
+    expect(nodes.children).toBeInstanceOf(Array);
+    expect(Array.isArray(nodes.children)).toBeFalsy();
   });
 
   it("Nullish not instanceof NodeList", () => {

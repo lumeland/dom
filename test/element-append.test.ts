@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { Comment, DOMParser, Node } from "../mod.ts";
+import { dom, DOMParser } from "../mod.ts";
 
 describe("element append", () => {
   it("Element.append", () => {
@@ -20,11 +20,12 @@ describe("element append", () => {
     expect(parent.childNodes.length).toBe(7);
     expect(parent.children.length).toBe(2);
 
-    parent.append(new Comment(), doc.createElement("img"), "beef");
+    parent.append(new dom.Comment(), doc.createElement("img"), "beef");
 
     expect(parent.lastChild?.nodeValue, "beef");
-    expect(parent.lastChild?.nodeType).toBe(Node.TEXT_NODE);
+    expect(parent.lastChild?.nodeType).toBe(dom.Node.TEXT_NODE);
     expect(parent.childNodes.length).toBe(10);
+
     expect(parent.children.length).toBe(3);
 
     parent.append(childB);
@@ -38,7 +39,7 @@ describe("element append", () => {
     expect(parent.childNodes.length).toBe(10);
     expect(parent.children.length).toBe(3);
 
-    const otherChildren = (["foo"] as (Node | string)[])
+    const otherChildren = (["foo"] as (DOM.Node | string)[])
       .concat(Array.from(parent.childNodes))
       .filter((node) => node !== childB);
 
