@@ -1,6 +1,7 @@
-import { createClone } from "./_utils.ts";
+import { createClone, setOwnerElement } from "./_utils.ts";
 
 class AttrClass extends dom.Node {
+  #ownerElement: DOM.Element | null = null;
   value: string;
 
   constructor(name: string, value: string) {
@@ -21,11 +22,11 @@ class AttrClass extends dom.Node {
   get namespaceURI(): string | null {
     throw new Error("to-do");
   }
-  get ownerDocument(): DOM.Document {
-    throw new Error("to-do");
+  [setOwnerElement](element: DOM.Element | null) {
+    this.#ownerElement = element;
   }
   get ownerElement(): DOM.Element | null {
-    throw new Error("to-do");
+    return this.#ownerElement;
   }
   get prefix(): string | null {
     throw new Error("to-do");

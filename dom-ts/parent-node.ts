@@ -50,19 +50,11 @@ abstract class ParentNodeClass extends dom.Node {
     this.childNodes.unshift(...allNodes);
   }
   querySelector<E extends DOM.Element = DOM.Element>(selectors: string): E | null {
-    return this[selectorAPI].first(selectors, this) as E;
+    return this[selectorAPI].first(selectors, this as unknown as DOM.Element) as E;
   }
-  querySelectorAll<K extends keyof HTMLElementTagNameMap>(
-    selectors: K,
-  ): DOM.NodeList<HTMLElementTagNameMap[K]>;
-  querySelectorAll<K extends keyof SVGElementTagNameMap>(
-    selectors: K,
-  ): DOM.NodeList<SVGElementTagNameMap[K]>;
-  querySelectorAll<K extends keyof MathMLElementTagNameMap>(
-    selectors: K,
-  ): DOM.NodeList<MathMLElementTagNameMap[K]>;
   querySelectorAll<E extends DOM.Element = DOM.Element>(selectors: string): DOM.NodeList<E> {
-    throw new Error("to-do");
+    const result = this[selectorAPI].select(selectors, this as unknown as DOM.Element);
+    return new dom.NodeList(...result) as DOM.NodeList<E>;
   }
   replaceChildren(...nodes: (DOM.Node | string)[]): void {
     throw new Error("to-do");

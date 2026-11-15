@@ -1,13 +1,15 @@
 import {
   createClone,
-  fragmentNodesFromString,
+  flatNodes,
   getElementsByClassName,
   getElementsByTagName,
   getElementsByTagNameWildcard,
   getOuterOrInnerHtml,
+  nodesFromArray,
+  parseFrag,
   type SelectorAPI,
   selectorAPI,
-  setOwnerDocument,
+  setOwnerElement,
   setParentNode,
 } from "./_utils.ts";
 
@@ -22,7 +24,7 @@ class ElementClass extends dom.ParentNode {
       this.attributes.push(
         ...attributes.map(([name, value]) => {
           const attr = new dom.Attr(name, value);
-          attr[setParentNode](this);
+          attr[setOwnerElement](this);
           return attr;
         }),
       );
@@ -37,7 +39,6 @@ class ElementClass extends dom.ParentNode {
     const api = this.ownerDocument?.[selectorAPI];
 
     if (!api) {
-      console.log([this.ownerDocument]);
       throw new Error("This node must have an owner document to use the Selector API");
     }
 
@@ -82,6 +83,12 @@ class ElementClass extends dom.ParentNode {
   get localName(): string {
     return this.tagName.toLowerCase();
   }
+  set nodeValue(_value: string | null) {
+    // Ignored
+  }
+  get nodeValue() {
+    return null;
+  }
   // to-do: implement other namespaces
   get namespaceURI(): string | null {
     return "http://www.w3.org/1999/xhtml";
@@ -115,12 +122,13 @@ class ElementClass extends dom.ParentNode {
       return;
     }
 
-    const parsed = fragmentNodesFromString(value, this.localName);
-    for (const child of parsed.childNodes[0].childNodes) {
-      childNodes.push(child);
+    const parsed = JSON.parse(parseFrag(value, this.localName));
+    const nodes = Array.from(nodesFromArray(parsed, this.ownerDocument).childNodes);
+
+    for (const child of nodes) {
       child[setParentNode](this);
-      child[setOwnerDocument](this.ownerDocument);
     }
+    childNodes.push(...nodes);
   }
   get outerHTML(): string {
     return getOuterOrInnerHtml(this, true);
@@ -210,7 +218,7 @@ class ElementClass extends dom.ParentNode {
     throw new Error("to-do");
   }
   hasAttribute(qualifiedName: string): boolean {
-    throw new Error("to-do");
+    return this.#attributes?.getNamedItem(qualifiedName) !== null;
   }
   hasAttributeNS(namespace: string | null, localName: string): boolean {
     throw new Error("to-do");
@@ -236,7 +244,7 @@ class ElementClass extends dom.ParentNode {
     throw new Error("to-do");
   }
   removeAttribute(qualifiedName: string): void {
-    throw new Error("to-do");
+    this.attributes.removeNamedItem(qualifiedName);
   }
   removeAttributeNS(namespace: string | null, localName: string): void {
     throw new Error("to-do");
@@ -251,7 +259,7 @@ class ElementClass extends dom.ParentNode {
       return;
     }
     const attr = new dom.Attr(qualifiedName, value);
-    attr[setParentNode](this);
+    attr[setOwnerElement](this);
     this.attributes.push(attr);
   }
   setAttributeNS(namespace: string | null, qualifiedName: string, value: string): void {
@@ -270,13 +278,83 @@ class ElementClass extends dom.ParentNode {
     throw new Error("to-do");
   }
   toggleAttribute(qualifiedName: string, force?: boolean): boolean {
-    throw new Error("to-do");
+    const existing = this.attributes.getNamedItem(qualifiedName);
+
+    if (force === true) {
+      if (!existing) {
+        this.setAttribute(qualifiedName, "");
+      }
+      return true;
+    }
+
+    if (force === false) {
+      if (existing) {
+        this.removeAttribute(qualifiedName);
+      }
+      return false;
+    }
+
+    if (existing) {
+      this.removeAttribute(qualifiedName);
+      return false;
+    }
+
+    this.setAttribute(qualifiedName, "");
+    return true;
   }
   after(...nodes: (DOM.Node | string)[]): void {
-    throw new Error("to-do");
+    const parentNode = this.parentNode;
+    const thisSiblings = parentNode?.childNodes;
+    if (!thisSiblings) {
+      return;
+    }
+
+    const allNodes = flatNodes(nodes);
+
+    for (const node of allNodes) {
+      if (node === this) {
+        continue;
+      }
+
+      const oldSiblings = node.parentNode?.childNodes;
+      if (oldSiblings) {
+        oldSiblings.splice(oldSiblings.indexOf(node), 1);
+      }
+      node[setParentNode](parentNode);
+    }
+
+    if (allNodes.includes(this)) {
+      thisSiblings.splice(thisSiblings.indexOf(this), 1, ...allNodes);
+    } else {
+      thisSiblings.splice(thisSiblings.indexOf(this) + 1, 0, ...allNodes);
+    }
   }
   before(...nodes: (DOM.Node | string)[]): void {
-    throw new Error("to-do");
+    const parentNode = this.parentNode;
+    const thisSiblings = parentNode?.childNodes;
+    if (!thisSiblings) {
+      return;
+    }
+
+    const allNodes = flatNodes(nodes);
+
+    for (const node of allNodes) {
+      if (node === this) {
+        continue;
+      }
+
+      const oldSiblings = node.parentNode?.childNodes;
+      if (oldSiblings) {
+        oldSiblings.splice(oldSiblings.indexOf(node), 1);
+      }
+      node[setParentNode](parentNode);
+    }
+
+    if (allNodes.includes(this)) {
+      thisSiblings.splice(thisSiblings.indexOf(this), 1, ...allNodes);
+    } else {
+      thisSiblings.splice(thisSiblings.indexOf(this), 0, ...allNodes);
+    }
   }
   remove(): void {
     const siblings = this.parentNode?.childNodes;
@@ -288,7 +366,27 @@ class ElementClass extends dom.ParentNode {
     this[setParentNode](null);
   }
   replaceWith(...nodes: (DOM.Node | string)[]): void {
-    throw new Error("to-do");
+    const parentNode = this.parentNode;
+    const thisSiblings = parentNode?.childNodes;
+    if (!thisSiblings) {
+      return;
+    }
+
+    const allNodes = flatNodes(nodes);
+    this[setParentNode](null);
+
+    for (const node of allNodes) {
+      node[setParentNode](parentNode);
+
+      if (node !== this) {
+        const oldSiblings = node.parentNode?.childNodes;
+        if (oldSiblings) {
+          oldSiblings.splice(oldSiblings.indexOf(node), 1);
+        }
+      }
+    }
+
+    thisSiblings.splice(thisSiblings.indexOf(this), 1, ...allNodes);
   }
   get nextElementSibling(): DOM.Element | null {
     const siblings = this.parentElement?.children;

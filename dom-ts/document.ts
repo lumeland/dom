@@ -54,6 +54,13 @@ export class DocumentClass extends dom.ParentNode {
     return this.#selector ?? (this.#selector = createSelector(this));
   }
 
+  set nodeValue(_value: string | null) {
+    // Ignored
+  }
+  get nodeValue() {
+    return null;
+  }
+
   get title(): string {
     return this.querySelector("title")?.textContent || "";
   }
@@ -237,7 +244,9 @@ export class DocumentClass extends dom.ParentNode {
     throw new Error("to-do");
   }
   createTextNode(data: string): DOM.Text {
-    throw new Error("to-do");
+    const node = new dom.Text(data);
+    node[setOwnerDocument](this.ownerDocument);
+    return node;
   }
   getElementById(elementId: string): DOM.HTMLElement | null {
     return getElementById(this.documentElement.childNodes, elementId);

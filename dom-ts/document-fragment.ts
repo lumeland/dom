@@ -1,8 +1,15 @@
-import { type SelectorAPI, selectorAPI } from "./_utils.ts";
+import { createClone, type SelectorAPI, selectorAPI } from "./_utils.ts";
 
 class DocumentFragmentClass extends dom.ParentNode {
   constructor() {
     super("#document-fragment", dom.NodeType.DOCUMENT_FRAGMENT_NODE);
+  }
+
+  set nodeValue(_value: string | null) {
+    // Ignored
+  }
+  get nodeValue() {
+    return null;
   }
 
   get [selectorAPI](): SelectorAPI {
@@ -13,6 +20,10 @@ class DocumentFragmentClass extends dom.ParentNode {
     }
 
     return api;
+  }
+
+  [createClone](): DOM.DocumentFragment {
+    return new dom.DocumentFragment();
   }
 
   getElementById(elementId: string): DOM.HTMLElement | null {

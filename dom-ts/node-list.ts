@@ -17,8 +17,8 @@ class NodeListClass<T extends DOM.Node = DOM.Node> extends Array<T> {
   toString() {
     return "[object NodeList]";
   }
-  push(index: T) {
-    const result = super.push(index);
+  push(...item: T[]) {
+    const result = super.push(...item);
     this.#onchange?.();
     return result;
   }

@@ -4,6 +4,7 @@ import { DOM as DOMSelector } from "../api/dom/selectors/nwsapi-types.ts";
 export const createClone = Symbol.for("createClone");
 export const setParentNode = Symbol.for("setParentNode");
 export const setOwnerDocument = Symbol.for("setOwnerDocument");
+export const setOwnerElement = Symbol.for("setOwnerElement");
 export const selectorAPI = Symbol.for("getSelector");
 
 export type Selector = (doc: DOM.Document) => {

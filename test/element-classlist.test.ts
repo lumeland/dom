@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { DOMParser, DOMTokenList } from "../mod.ts";
+import { DOMParser, dom } from "../mod.ts";
 
 describe("Element classList", () => {
   it("Element.classList.value", () => {

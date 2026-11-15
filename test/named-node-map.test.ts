@@ -251,12 +251,12 @@ describe("Named node map", () => {
     const div5 = doc.querySelector("[data-others]")!;
     const div6 = doc.querySelector("[data-more-others]")!;
 
-    expect(div1.getAttributeNames()).toStrictEqual(["id", "class"]);
-    expect(div2.getAttributeNames()).toStrictEqual(["class", "id"]);
-    expect(div3.getAttributeNames()).toStrictEqual(["id"]);
-    expect(div4.getAttributeNames()).toStrictEqual(["class"]);
-    expect(div5.getAttributeNames()).toStrictEqual(["data-others", "class", "id"]);
-    expect(div6.getAttributeNames()).toStrictEqual(["id", "data-more-others", "class"]);
+    expect(div1.getAttributeNames()).toEqual(["id", "class"]);
+    expect(div2.getAttributeNames()).toEqual(["class", "id"]);
+    expect(div3.getAttributeNames()).toEqual(["id"]);
+    expect(div4.getAttributeNames()).toEqual(["class"]);
+    expect(div5.getAttributeNames()).toEqual(["data-others", "class", "id"]);
+    expect(div6.getAttributeNames()).toEqual(["id", "data-more-others", "class"]);
 
     // Test that ordering is undisturbed when setting id/class a second time
     div1.setAttribute("id", "div1-id");

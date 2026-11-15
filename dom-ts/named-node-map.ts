@@ -1,4 +1,10 @@
 class NamedNodeMapClass extends Array<DOM.Attr> {
+  set nodeValue(_value: string | null) {
+    // Ignored
+  }
+  get nodeValue() {
+    return null;
+  }
   getNamedItem(qualifiedName: string): DOM.Attr | null {
     qualifiedName = qualifiedName.toLowerCase();
     return this.find((item) => item.name === qualifiedName) ?? null;
