@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { DocumentFragment, DOMParser, HTMLTemplateElement, NodeType } from "../mod.ts";
+import { DOMParser, dom } from "../mod.ts";
 
 describe("template element", () => {
   it("HTMLTemplateElement", () => {
@@ -25,17 +25,17 @@ describe("template element", () => {
       "text/html",
     );
 
-    const templA = doc.querySelector(".templ-a")! as HTMLTemplateElement;
-    const templB = doc.querySelector(".templ-b")! as HTMLTemplateElement;
+    const templA = doc.querySelector(".templ-a")! as DOM.HTMLTemplateElement;
+    const templB = doc.querySelector(".templ-b")! as DOM.HTMLTemplateElement;
     const articles = doc.querySelectorAll("article")!;
     const paragraph = doc.querySelector("p");
 
     expect(articles.length).toBe(1);
     expect(templA.childNodes.length + templB.childNodes.length).toBe(0);
-    expect(templA.constructor).toBe(HTMLTemplateElement);
-    expect(templB.constructor).toBe(HTMLTemplateElement);
-    expect(templA.content.constructor).toBe(DocumentFragment);
-    expect(templB.content.constructor).toBe(DocumentFragment);
+    expect(templA.constructor).toBe(dom.HTMLTemplateElement);
+    expect(templB.constructor).toBe(dom.HTMLTemplateElement);
+    expect(templA.content.constructor).toBe(dom.DocumentFragment);
+    expect(templB.content.constructor).toBe(dom.DocumentFragment);
     expect(paragraph).toBeNull();
     expect(templB.outerHTML).toBe(`<template class="templ-b"><b>foo <i>bar</i></b></template>`);
 
@@ -72,7 +72,9 @@ describe("template element", () => {
     expect(templB.childNodes.length).toBe(2);
 
     // Check that our new <aside> is there by checking for its chlld text node
-    expect(templB.content.querySelector("aside")?.childNodes[0].nodeType).toBe(NodeType.TEXT_NODE);
+    expect(templB.content.querySelector("aside")?.childNodes[0].nodeType).toBe(
+      dom.NodeType.TEXT_NODE,
+    );
 
     // Remove all children
     for (const node of templB.childNodes) {
@@ -87,10 +89,10 @@ describe("template element", () => {
 
   it('document.createElement("template")', () => {
     const doc = new DOMParser().parseFromString("", "text/html");
-    const templ = doc.createElement("template") as HTMLTemplateElement;
+    const templ = doc.createElement("template");
 
-    expect(templ.constructor).toBe(HTMLTemplateElement);
-    expect(templ.content?.constructor).toBe(DocumentFragment);
+    expect(templ.constructor).toBe(dom.HTMLTemplateElement);
+    expect(templ.content?.constructor).toBe(dom.DocumentFragment);
     expect(templ.content.childNodes.length).toBe(0);
   });
 
@@ -113,14 +115,14 @@ describe("template element", () => {
       "text/html",
     );
 
-    const templ = doc.querySelector("template#first") as HTMLTemplateElement;
+    const templ = doc.querySelector("template#first") as DOM.HTMLTemplateElement;
     const templShallowClone = templ.cloneNode();
     const templDeepClone = templ.cloneNode(true);
 
-    expect(templShallowClone.constructor).toBe(HTMLTemplateElement);
-    expect(templDeepClone.constructor).toBe(HTMLTemplateElement);
-    expect(templShallowClone.content?.constructor).toBe(DocumentFragment);
-    expect(templDeepClone.content?.constructor).toBe(DocumentFragment);
+    expect(templShallowClone.constructor).toBe(dom.HTMLTemplateElement);
+    expect(templDeepClone.constructor).toBe(dom.HTMLTemplateElement);
+    expect(templShallowClone.content?.constructor).toBe(dom.DocumentFragment);
+    expect(templDeepClone.content?.constructor).toBe(dom.DocumentFragment);
 
     expect(templ.getAttribute("data-thing")).toBe("something");
     expect(templShallowClone.getAttribute("data-thing")).toBe("something");
@@ -154,13 +156,13 @@ describe("template element", () => {
     expect(templDeepClone.content.querySelector("h1")?.textContent).toBe("foo");
     expect(templDeepClone.content.querySelector("h1")).not.toBe(templ.content.querySelector("h1"));
 
-    const outer = doc.querySelector("#outer") as HTMLTemplateElement;
-    const wrongInner = doc.querySelector("#inner") as HTMLTemplateElement | null;
-    const inner = outer.content.querySelector("#inner") as HTMLTemplateElement;
+    const outer = doc.querySelector("#outer") as DOM.HTMLTemplateElement;
+    const wrongInner = doc.querySelector("#inner") as DOM.HTMLTemplateElement | null;
+    const inner = outer.content.querySelector("#inner") as DOM.HTMLTemplateElement;
 
     expect(wrongInner).toBeNull();
-    expect(outer.constructor).toBe(HTMLTemplateElement);
-    expect(inner.constructor).toBe(HTMLTemplateElement);
+    expect(outer.constructor).toBe(dom.HTMLTemplateElement);
+    expect(inner.constructor).toBe(dom.HTMLTemplateElement);
 
     expect(outer.content.querySelector("article")?.textContent).toBe("fizz");
     expect(outer.content.querySelector("aside")?.textContent).toBeUndefined();
@@ -177,14 +179,14 @@ describe("template element", () => {
 
     const outerDeepCloneInner = outerDeepClone.content.querySelector(
       "#inner",
-    ) as HTMLTemplateElement;
+    ) as DOM.HTMLTemplateElement;
 
     expect(outerShallowClone.content.childNodes.length).toBe(0);
     expect(outerDeepClone.content.childNodes.length).toBe(7);
     expect(outerShallowClone.querySelector("#inner")).toBeNull();
     expect(outerShallowClone.content.querySelector("#inner")).toBeNull();
     expect(outerDeepClone.querySelector("#inner")).toBeNull();
-    expect(outerDeepCloneInner.constructor).toBe(HTMLTemplateElement);
+    expect(outerDeepCloneInner.constructor).toBe(dom.HTMLTemplateElement);
 
     expect(outerDeepCloneInner).not.toBe(inner);
     expect(outerDeepCloneInner.content).not.toBe(inner.content);
@@ -223,9 +225,9 @@ describe("template element", () => {
 
     const replacedOuterDeepCloneInner = replacedOuterDeepClone.content.querySelector(
       "template",
-    ) as HTMLTemplateElement;
+    ) as DOM.HTMLTemplateElement;
 
-    expect(replacedOuterDeepCloneInner?.constructor).toBe(HTMLTemplateElement);
+    expect(replacedOuterDeepCloneInner?.constructor).toBe(dom.HTMLTemplateElement);
     expect(replacedOuterDeepCloneInner.querySelector("figure")).toBeNull();
     expect(replacedOuterDeepCloneInner.content.querySelector("figure")?.tagName).toBe("FIGURE");
 

@@ -72,7 +72,7 @@ describe("Charater data", () => {
     const comment = doc.body?.childNodes[1] as DOM.Comment;
 
     expect(doc.body?.childNodes.length).toBe(2);
-    expect((text as any).previousSibling).toBe(null);
+    expect(text.previousSibling).toBe(null);
 
     text.before(new dom.Comment("fizz"));
 

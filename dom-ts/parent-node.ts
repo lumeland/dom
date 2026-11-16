@@ -49,10 +49,10 @@ abstract class ParentNodeClass extends dom.Node {
 
     this.childNodes.unshift(...allNodes);
   }
-  querySelector<E extends DOM.Element = DOM.Element>(selectors: string): E | null {
+  querySelector<E extends DOM.Element = DOM.HTMLElement>(selectors: string): E | null {
     return this[selectorAPI].first(selectors, this as unknown as DOM.Element) as E;
   }
-  querySelectorAll<E extends DOM.Element = DOM.Element>(selectors: string): DOM.NodeList<E> {
+  querySelectorAll<E extends DOM.Element = DOM.HTMLElement>(selectors: string): DOM.NodeList<E> {
     const result = this[selectorAPI].select(selectors, this as unknown as DOM.Element);
     return new dom.NodeList(...result) as DOM.NodeList<E>;
   }

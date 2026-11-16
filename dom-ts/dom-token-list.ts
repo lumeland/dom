@@ -1,11 +1,16 @@
 const SPACE_REGEX = /\s+/;
 
-class DOMTokenListClass extends Array<string> implements DOMTokenList {
+class DOMTokenListClass extends Array<string> {
   get value(): string {
     return this.join(" ");
   }
   set value(tokens: string) {
-    this.splice(0, this.length, ...tokens.trim().split(SPACE_REGEX));
+    tokens = tokens.trim();
+    if (tokens === "") {
+      this.splice(0, this.length);
+    } else {
+      this.splice(0, this.length, ...new Set(tokens.split(SPACE_REGEX)));
+    }
   }
   toString(): string {
     return this.value;
@@ -21,7 +26,7 @@ class DOMTokenListClass extends Array<string> implements DOMTokenList {
     return this.includes(token);
   }
   item(index: number): string | null {
-    return this[index] ?? null;
+    return this[Number.isInteger(index) ? Math.trunc(index) : 0] ?? null;
   }
   remove(...tokens: string[]): void {
     for (const token of tokens) {
@@ -37,7 +42,11 @@ class DOMTokenListClass extends Array<string> implements DOMTokenList {
       return false;
     }
 
-    this[index] = newToken;
+    if (this.includes(newToken)) {
+      this.splice(index, 1);
+    } else {
+      this[index] = newToken;
+    }
     return true;
   }
   supports(_token: string): boolean {
@@ -72,7 +81,7 @@ class DOMTokenListClass extends Array<string> implements DOMTokenList {
     callbackfn: (value: string, key: number, parent: DOM.DOMTokenList) => void,
     thisArg?: any,
   ): void {
-    this.forEach((value, key) => callbackfn(value, key, this), thisArg);
+    super.forEach((value, key) => callbackfn(value, key, this), thisArg);
   }
 }
 

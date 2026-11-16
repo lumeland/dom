@@ -1,6 +1,8 @@
-import { createClone } from "./_utils.ts";
+import { createClone, toDataAttrName, toDataPropName } from "./_utils.ts";
 
 class HTMLElementClass extends dom.Element {
+  #dataset: Record<string, string | undefined> | null = null;
+
   [createClone](): DOM.HTMLElement {
     return new dom.HTMLElement(this.tagName, []);
   }
@@ -48,10 +50,10 @@ class HTMLElementClass extends dom.Element {
     throw new Error("to-do");
   }
   get innerText(): string {
-    throw new Error("to-do");
+    return this.textContent ?? "";
   }
   set innerText(value: string) {
-    throw new Error("to-do");
+    this.textContent = value;
   }
   get lang(): string {
     throw new Error("to-do");
@@ -97,7 +99,50 @@ class HTMLElementClass extends dom.Element {
   }
 
   get dataset(): DOMStringMap {
-    throw new Error("to-do");
+    if (this.#dataset) {
+      return this.#dataset;
+    }
+
+    this.#dataset = new Proxy<Record<string, string | undefined>>(
+      {},
+      {
+        get: (_target, property) => {
+          const name = toDataAttrName(String(property));
+          return this.getAttribute(name) ?? undefined;
+        },
+
+        set: (_target, property, value) => {
+          const name = toDataAttrName(String(property));
+          this.setAttribute(name, String(value));
+          return true;
+        },
+
+        deleteProperty: (_target, property) => {
+          const name = toDataAttrName(String(property));
+          this.removeAttribute(name);
+          return true;
+        },
+
+        ownKeys: () =>
+          this.getAttributeNames()
+            .filter((name) => name.startsWith("data-"))
+            .map(toDataPropName),
+
+        getOwnPropertyDescriptor: (_target, property) => {
+          if (this.hasAttribute(toDataAttrName(String(property)))) {
+            return {
+              writable: true,
+              enumerable: true,
+              configurable: true,
+            };
+          }
+        },
+
+        has: (_target, property) => this.hasAttribute(toDataAttrName(String(property))),
+      },
+    );
+
+    return this.#dataset;
   }
   get attributeStyleMap(): StylePropertyMap {
     throw new Error("to-do");

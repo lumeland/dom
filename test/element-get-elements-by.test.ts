@@ -1,4 +1,4 @@
-import { DOMParser, Element } from "../mod.ts";
+import { DOMParser } from "../mod.ts";
 import { describe, it, expect } from "vitest";
 
 describe("getElementsBy", () => {
@@ -74,9 +74,7 @@ describe("getElementsBy", () => {
     expect(mainP).toBeTruthy();
     expect(articleP).toBeTruthy();
 
-    const imgParentArticle = (img!.parentElement! as Element).getElementsByClassName(
-      "an-article",
-    )[0];
+    const imgParentArticle = img!.parentElement!.getElementsByClassName("an-article")[0];
 
     expect(aside.tagName).toBe("ASIDE");
     expect(article.tagName).toBe("ARTICLE");
@@ -109,23 +107,22 @@ describe("getElementsBy", () => {
       `,
       "text/html",
     );
-    const divMain = doc.querySelector("#main")!;
-    const aside = divMain.getElementById("an-aside")!;
-    const article = divMain.getElementById("an-article")!;
+    const aside = doc.getElementById("an-aside")!;
+    const article = doc.getElementById("an-article")!;
 
     expect(aside).toBeTruthy();
     expect(article).toBeTruthy();
 
     const img = article.previousElementSibling!;
-    const mainP = divMain.getElementById("this-p")!;
-    const articleP = article.getElementById("this-p")!;
-    const articlePClass = article.getElementById("this-p")!;
+    const mainP = doc.getElementById("this-p")!;
+    const articleP = doc.getElementById("this-p")!;
+    const articlePClass = doc.getElementById("this-p")!;
 
     expect(img).toBeTruthy();
     expect(mainP).toBeTruthy();
     expect(articleP).toBeTruthy();
 
-    const imgParentArticle = (img!.parentElement! as Element).getElementById("an-article");
+    const imgParentArticle = doc.getElementById("an-article");
 
     expect(aside.tagName).toBe("ASIDE");
     expect(article.tagName).toBe("ARTICLE");

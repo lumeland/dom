@@ -22,6 +22,11 @@ class NodeListClass<T extends DOM.Node = DOM.Node> extends Array<T> {
     this.#onchange?.();
     return result;
   }
+  unshift(...item: T[]) {
+    const result = super.unshift(...item);
+    this.#onchange?.();
+    return result;
+  }
   splice(start: number, deleteCount: number, ...items: T[]) {
     const result = super.splice(start, deleteCount, ...items);
     this.#onchange?.();

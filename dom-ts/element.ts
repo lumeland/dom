@@ -115,7 +115,6 @@ class ElementClass extends dom.ParentNode {
     for (const child of childNodes) {
       child[setParentNode](null);
     }
-
     childNodes.splice(0, childNodes.length);
 
     if (!value.length) {
@@ -123,7 +122,7 @@ class ElementClass extends dom.ParentNode {
     }
 
     const parsed = JSON.parse(parseFrag(value, this.localName));
-    const nodes = Array.from(nodesFromArray(parsed, this.ownerDocument).childNodes);
+    const nodes = Array.from(nodesFromArray(parsed, this.ownerDocument).childNodes[0].childNodes);
 
     for (const child of nodes) {
       child[setParentNode](this);
@@ -134,7 +133,31 @@ class ElementClass extends dom.ParentNode {
     return getOuterOrInnerHtml(this, true);
   }
   set outerHTML(value: string) {
-    throw new Error("to-do");
+    const parentNode = this.parentNode;
+
+    if (!parentNode) {
+      return;
+    }
+
+    if (parentNode.nodeType === dom.NodeType.DOCUMENT_NODE) {
+      throw new DOMException("Modifications are not allowed for this document");
+    }
+
+    const { parentElement } = this;
+    const contextLocalName =
+      parentNode.nodeType === dom.NodeType.DOCUMENT_FRAGMENT_NODE
+        ? "body"
+        : parentElement?.localName;
+
+    const parsed = JSON.parse(parseFrag(value, contextLocalName));
+    const nodes = Array.from(nodesFromArray(parsed, this.ownerDocument).childNodes[0].childNodes);
+
+    for (const child of nodes) {
+      child[setParentNode](parentNode);
+    }
+
+    parentNode.childNodes.splice(parentNode.childNodes.indexOf(this), 1, ...nodes);
+    this[setParentNode](null);
   }
   get slot(): string {
     throw new Error("to-do");
@@ -148,13 +171,20 @@ class ElementClass extends dom.ParentNode {
   set part(value: string) {
     throw new Error("to-do");
   }
-  closest<K extends keyof HTMLElementTagNameMap>(selector: K): HTMLElementTagNameMap[K] | null;
-  closest<K extends keyof SVGElementTagNameMap>(selector: K): SVGElementTagNameMap[K] | null;
-  closest<K extends keyof MathMLElementTagNameMap>(selector: K): MathMLElementTagNameMap[K] | null;
   closest<E extends DOM.Element = DOM.Element>(selectors: string): E | null {
-    throw new Error("to-do");
+    // oxlint-disable-next-line typescript/no-this-alias
+    let el: DOM.Element | null = this;
+
+    do {
+      if (el.matches(selectors)) return el as E;
+      el = el.parentElement;
+    } while (el !== null);
+    return null;
   }
   getAttribute(qualifiedName: string): string | null {
+    if (qualifiedName === "class" && this.#classList) {
+      return this.#classList.value;
+    }
     return this.#attributes?.getNamedItem(qualifiedName)?.value ?? null;
   }
   getAttributeNS(namespace: string | null, localName: string): string | null {
@@ -163,8 +193,8 @@ class ElementClass extends dom.ParentNode {
   getAttributeNames(): string[] {
     return this.#attributes?.map((attr) => attr.name) ?? [];
   }
-  getAttributeNode(qualifiedName: string): Attr | null {
-    throw new Error("to-do");
+  getAttributeNode(qualifiedName: string): DOM.Attr | null {
+    return this.#attributes?.getNamedItem(qualifiedName) ?? null;
   }
   getAttributeNodeNS(namespace: string | null, localName: string): Attr | null {
     throw new Error("to-do");
@@ -235,13 +265,8 @@ class ElementClass extends dom.ParentNode {
   insertAdjacentText(where: InsertPosition, data: string): void {
     throw new Error("to-do");
   }
-  matches<K extends keyof HTMLElementTagNameMap>(selectors: K): this is HTMLElementTagNameMap[K];
-  matches<K extends keyof SVGElementTagNameMap>(selectors: K): this is SVGElementTagNameMap[K];
-  matches<K extends keyof MathMLElementTagNameMap>(
-    selectors: K,
-  ): this is MathMLElementTagNameMap[K];
   matches(selectors: string): boolean {
-    throw new Error("to-do");
+    return this[selectorAPI].match(selectors, this);
   }
   removeAttribute(qualifiedName: string): void {
     this.attributes.removeNamedItem(qualifiedName);
@@ -253,20 +278,23 @@ class ElementClass extends dom.ParentNode {
     throw new Error("to-do");
   }
   setAttribute(qualifiedName: string, value: string): void {
+    if (qualifiedName === "class" && this.#classList) {
+      this.#classList.value = value;
+    }
     const existing = this.attributes.getNamedItem(qualifiedName);
     if (existing) {
-      existing.value = value;
+      existing.value = String(value);
       return;
     }
-    const attr = new dom.Attr(qualifiedName, value);
+    const attr = new dom.Attr(qualifiedName, String(value));
     attr[setOwnerElement](this);
     this.attributes.push(attr);
   }
   setAttributeNS(namespace: string | null, qualifiedName: string, value: string): void {
     throw new Error("to-do");
   }
-  setAttributeNode(attr: Attr): Attr | null {
-    throw new Error("to-do");
+  setAttributeNode(attr: DOM.Attr): DOM.Attr | null {
+    return this.attributes.setNamedItem(attr);
   }
   setAttributeNodeNS(attr: Attr): Attr | null {
     throw new Error("to-do");

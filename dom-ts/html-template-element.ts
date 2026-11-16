@@ -5,6 +5,20 @@ class HTMLTemplateElementClass extends dom.HTMLElement {
     super("template", attributes);
     this.#content = content;
   }
+
+  cloneNode(deep = false): DOM.HTMLTemplateElement {
+    const newNode = super.cloneNode(deep) as DOM.HTMLTemplateElement;
+
+    if (deep) {
+      const content = newNode.content;
+      for (const child of this.content.childNodes) {
+        content.appendChild(child.cloneNode(deep));
+      }
+    }
+
+    return newNode;
+  }
+
   get content(): DOM.DocumentFragment {
     return this.#content;
   }

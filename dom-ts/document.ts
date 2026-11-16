@@ -196,6 +196,8 @@ export class DocumentClass extends dom.ParentNode {
   [createClone](): DOM.Document {
     return new dom.Document();
   }
+  createElement(tagName: "template"): DOM.HTMLTemplateElement;
+  createElement(tagName: string): DOM.HTMLElement;
   createElement(tagName: string): DOM.HTMLElement {
     tagName = tagName.toUpperCase();
 
