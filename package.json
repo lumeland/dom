@@ -1,5 +1,5 @@
 {
-  "name": "@lumeland/dom",
+  "name": "@lumeland/dom2",
   "description": "DOM & HTML parser in wasm",
   "author": {
     "name": "Óscar Otero"
@@ -15,6 +15,7 @@
     "lint": "oxlint . --fix"
   },
   "devDependencies": {
+    "@lumeland/dom": "^0.1.56",
     "@types/jsdom": "^30.0.0",
     "@types/node": "^26.6.6",
     "jsdom": "^31.0.0",

@@ -1,4 +1,5 @@
-globalThis.dom = {} as unknown as DOM;
+const dom = {} as unknown as DOM;
+globalThis.dom = dom;
 
 await import("./node-list.ts");
 await import("./node.ts");

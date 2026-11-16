@@ -166,6 +166,9 @@ importers:
 
   .:
     devDependencies:
+      '@lumeland/dom':
+        specifier: ^0.1.56
+        version: 0.1.56
       '@types/jsdom':
         specifier: ^30.0.0
         version: 30.0.0
@@ -214,6 +217,9 @@ packages:
 
   '@jridgewell/trace-mapping@0.3.31':
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
+
+  '@lumeland/dom@0.1.56':
+    resolution: {integrity: sha512-PLCpkKfRYqRuG87uU8dHnX3g80ljC/5yw7+xJ/HzbnhiiayhglDdLWXO4rV/fwbO/asH91QBDdZWY8dOGsX5lQ==}
 
   '@oxc-project/types@0.156.0':
     resolution: {integrity: sha512-1Duyg48TdJNdyhEB8Xn1L36bT9Pv6GUtlKjHxOys8xkaF/rQq3XJE+bAurSK/AgIz5mGFsb77cn9Pb20+WCScw==}
@@ -1023,6 +1029,8 @@ snapshots:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.6.0
+
+  '@lumeland/dom@0.1.56': {}
 
   '@oxc-project/types@0.156.0': {}
 
