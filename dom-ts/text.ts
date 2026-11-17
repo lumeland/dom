@@ -1,11 +1,11 @@
-import { createClone } from "./_utils.ts";
+import { $createClone } from "./_utils.ts";
 
 export class TextClass extends dom.CharacterData {
   constructor(text: string = "") {
     super(String(text), "#text", dom.NodeType.TEXT_NODE);
   }
 
-  [createClone](): DOM.Text {
+  [$createClone](): DOM.Text {
     return new dom.Text(this.data);
   }
 

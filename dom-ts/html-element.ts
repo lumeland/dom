@@ -1,9 +1,9 @@
-import { createClone, toDataAttrName, toDataPropName } from "./_utils.ts";
+import { $createClone, toDataAttrName, toDataPropName } from "./_utils.ts";
 
 class HTMLElementClass extends dom.Element {
   #dataset: Record<string, string | undefined> | null = null;
 
-  [createClone](): DOM.HTMLElement {
+  [$createClone](): DOM.HTMLElement {
     return new dom.HTMLElement(this.tagName, []);
   }
 

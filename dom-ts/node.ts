@@ -1,4 +1,4 @@
-import { createClone, setOwnerDocument, setParentNode } from "./_utils.ts";
+import { checkAncestor, $createClone, $ownerDocument, $parentNode } from "./_utils.ts";
 
 const NodeTypes = {
   ELEMENT_NODE: 1,
@@ -64,7 +64,7 @@ class NodeClass extends EventTarget {
     this.nodeType = nodeType;
   }
 
-  [createClone](): DOM.Node {
+  [$createClone](): DOM.Node {
     return new dom.Node(this.nodeName, this.nodeType);
   }
 
@@ -100,7 +100,7 @@ class NodeClass extends EventTarget {
     return this.#ownerDocument;
   }
 
-  [setOwnerDocument](ownerDocument: DOM.Document | null) {
+  set [$ownerDocument](ownerDocument: DOM.Document | null) {
     if (ownerDocument === this.#ownerDocument) {
       return;
     }
@@ -108,7 +108,7 @@ class NodeClass extends EventTarget {
 
     if (this.#childNodes) {
       for (const child of this.#childNodes) {
-        child[setOwnerDocument](ownerDocument);
+        child[$ownerDocument] = ownerDocument;
       }
     }
   }
@@ -125,7 +125,7 @@ class NodeClass extends EventTarget {
     return this.#parentNode;
   }
 
-  [setParentNode](parentNode: DOM.Node | null) {
+  set [$parentNode](parentNode: DOM.Node | null) {
     this.#parentNode = parentNode;
   }
 
@@ -183,6 +183,7 @@ class NodeClass extends EventTarget {
       return node;
     }
 
+    checkAncestor(this, [node]);
     this.childNodes.push(node);
     const siblings = node.parentNode?.childNodes;
     if (siblings) {
@@ -213,7 +214,8 @@ class NodeClass extends EventTarget {
       return node;
     }
 
-    const index = this.childNodes.indexOf(child);
+    const childNodes = this.childNodes;
+    const index = childNodes.indexOf(child);
     if (index === -1) {
       throw new Error("DOMException: Child to insert before is not a child of this node");
     }
@@ -225,15 +227,17 @@ class NodeClass extends EventTarget {
       return node;
     }
 
-    this.childNodes.splice(index, 0, node);
-
-    if (node.#parentNode && node.#parentNode !== this) {
-      const oldSiblings = node.#parentNode.childNodes;
-      if (oldSiblings) {
-        oldSiblings.splice(oldSiblings.indexOf(node), 1);
-      }
+    if (node === child) {
+      return node;
     }
 
+    const oldSiblings = node.#parentNode?.childNodes;
+
+    if (oldSiblings) {
+      oldSiblings.splice(oldSiblings.indexOf(node), 1);
+    }
+
+    childNodes.splice(index, 0, node);
     node.#parentNode = this;
     return node;
   }
@@ -242,7 +246,7 @@ class NodeClass extends EventTarget {
   }
 
   cloneNode(subtree?: boolean): typeof this {
-    const clone = this[createClone]();
+    const clone = this[$createClone]();
     clone.#ownerDocument = this.#ownerDocument;
 
     if (subtree && this.#childNodes) {
@@ -353,7 +357,38 @@ class NodeClass extends EventTarget {
     throw new Error("to-do");
   }
   normalize(): void {
-    throw new Error("to-do");
+    let i = 0;
+    while (i < this.childNodes.length) {
+      const currentNode = this.childNodes[i];
+
+      if (currentNode.nodeType === dom.NodeType.TEXT_NODE) {
+        if (currentNode.nodeValue === "") {
+          this.removeChild(currentNode);
+          continue;
+        }
+
+        let nodeValue = currentNode.nodeName ?? "";
+        let nextNode = this.childNodes[i + 1];
+
+        // Merge adjacent text nodes
+        while (nextNode && nextNode.nodeType === dom.NodeType.TEXT_NODE) {
+          nodeValue += nextNode.nodeValue;
+          this.removeChild(nextNode);
+          nextNode = this.childNodes[i + 1];
+        }
+
+        if (nodeValue === "") {
+          this.removeChild(currentNode);
+          continue;
+        }
+        currentNode.nodeValue = nodeValue;
+        i++;
+        continue;
+      }
+
+      currentNode.normalize();
+      i++;
+    }
   }
   removeChild<T extends DOM.Node>(child: T): T {
     const childNodes = this.#childNodes;

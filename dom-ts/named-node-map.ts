@@ -1,4 +1,12 @@
-class NamedNodeMapClass extends Array<DOM.Attr> {
+import { $className, $ownerElement, ArrayLike } from "./_utils.ts";
+
+class NamedNodeMapClass extends ArrayLike<DOM.Attr> {
+  #ownerElement: DOM.Element | null = null;
+
+  set [$ownerElement](ownerElement: DOM.Element) {
+    this.#ownerElement = ownerElement;
+  }
+
   set nodeValue(_value: string | null) {
     // Ignored
   }
@@ -20,7 +28,10 @@ class NamedNodeMapClass extends Array<DOM.Attr> {
     if (index === -1) {
       throw new DOMException("Node was not found");
     }
-    return this.splice(index, 1)[0];
+    const item = this.splice(index, 1)[0];
+    item[$ownerElement] = null;
+    if (qualifiedName === "class") this.#ownerElement?.[$className](null);
+    return item;
   }
   removeNamedItemNS(namespace: string | null, localName: string): DOM.Attr {
     throw new Error("to-do");
@@ -30,7 +41,9 @@ class NamedNodeMapClass extends Array<DOM.Attr> {
     if (existing) {
       this.removeNamedItem(attr.name);
     }
+    attr[$ownerElement] = this.#ownerElement;
     this.push(attr);
+    if (attr.name === "class") this.#ownerElement?.[$className](attr.value);
     return existing ?? null;
   }
   setNamedItemNS(attr: DOM.Attr): DOM.Attr | null {

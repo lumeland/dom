@@ -1,9 +1,9 @@
+import { $onChange } from "./_utils.ts";
+
 class HTMLCollectionClass extends Array<DOM.Element> {
   static createFromNodeList(nodes: DOM.NodeList): DOM.HTMLCollection {
     const collection = new dom.HTMLCollection(...nodes.filter(isElement));
-    dom.NodeList.sync(nodes, () =>
-      collection.splice(0, collection.length, ...nodes.filter(isElement)),
-    );
+    nodes[$onChange] = () => collection.splice(0, collection.length, ...nodes.filter(isElement));
     return collection;
   }
 

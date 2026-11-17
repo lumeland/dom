@@ -1,15 +1,21 @@
+import { ArrayLike } from "./_utils.ts";
+
 const SPACE_REGEX = /\s+/;
 
-class DOMTokenListClass extends Array<string> {
+class DOMTokenListClass extends ArrayLike<string> {
   get value(): string {
     return this.join(" ");
   }
   set value(tokens: string) {
     tokens = tokens.trim();
-    if (tokens === "") {
-      this.splice(0, this.length);
-    } else {
-      this.splice(0, this.length, ...new Set(tokens.split(SPACE_REGEX)));
+    const newTokens = tokens ? Array.from(new Set(tokens.split(SPACE_REGEX))) : [];
+
+    // Change only if it's different
+    if (
+      this.length !== newTokens.length ||
+      this.filter((token) => newTokens.includes(token)).length !== this.length
+    ) {
+      this.splice(0, this.length, ...newTokens);
     }
   }
   toString(): string {

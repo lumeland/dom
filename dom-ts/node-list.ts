@@ -1,10 +1,6 @@
-class NodeListClass<T extends DOM.Node = DOM.Node> extends Array<T> {
-  #onchange?: () => void;
+import { ArrayLike } from "./_utils.ts";
 
-  static sync(nodes: DOM.NodeList, callback: () => void) {
-    nodes.#onchange = callback;
-  }
-
+class NodeListClass<T extends DOM.Node = DOM.Node> extends ArrayLike<T> {
   item(index: number): T | null {
     return this[index] ?? null;
   }
@@ -16,21 +12,6 @@ class NodeListClass<T extends DOM.Node = DOM.Node> extends Array<T> {
   }
   toString() {
     return "[object NodeList]";
-  }
-  push(...item: T[]) {
-    const result = super.push(...item);
-    this.#onchange?.();
-    return result;
-  }
-  unshift(...item: T[]) {
-    const result = super.unshift(...item);
-    this.#onchange?.();
-    return result;
-  }
-  splice(start: number, deleteCount: number, ...items: T[]) {
-    const result = super.splice(start, deleteCount, ...items);
-    this.#onchange?.();
-    return result;
   }
 }
 

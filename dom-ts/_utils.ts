@@ -1,11 +1,14 @@
 export { parse, parseFrag } from "../api/parser.ts";
 import { DOM as DOMSelector } from "../api/dom/selectors/nwsapi-types.ts";
 
-export const createClone = Symbol.for("createClone");
-export const setParentNode = Symbol.for("setParentNode");
-export const setOwnerDocument = Symbol.for("setOwnerDocument");
-export const setOwnerElement = Symbol.for("setOwnerElement");
-export const selectorAPI = Symbol.for("getSelector");
+export const $createClone = Symbol.for("createClone");
+export const $parentNode = Symbol.for("parentNode");
+export const $ownerDocument = Symbol.for("ownerDocument");
+export const $ownerElement = Symbol.for("ownerElement");
+export const $classList = Symbol.for("classList");
+export const $selectorAPI = Symbol.for("selectorAPI");
+export const $onChange = Symbol.for("onChange");
+export const $className = Symbol.for("className");
 
 export type Selector = (doc: DOM.Document) => {
   first(
@@ -109,13 +112,13 @@ export function nodesFromArray(
 
   if (isTemplateElement(data)) {
     const contentFrag = new dom.DocumentFragment();
-    contentFrag[setOwnerDocument](ownerDocument);
+    contentFrag[$ownerDocument] = ownerDocument;
     const content = nodesFromArray(data[3], ownerDocument);
     const childNodes = contentFrag.childNodes;
 
     for (const child of content.childNodes) {
       childNodes.push(child);
-      child[setParentNode](contentFrag);
+      child[$parentNode] = contentFrag;
     }
 
     return new dom.HTMLTemplateElement(attributes, contentFrag);
@@ -123,7 +126,7 @@ export function nodesFromArray(
 
   const ElementConstructor = dom.elements.get(nodeName) ?? dom.HTMLElement;
   const element = new ElementConstructor(nodeName, attributes);
-  element[setOwnerDocument](ownerDocument);
+  element[$ownerDocument] = ownerDocument;
   const childNodes = element.childNodes;
 
   for (const child of children) {
@@ -131,26 +134,26 @@ export function nodesFromArray(
       case dom.NodeType.TEXT_NODE:
         const text = new dom.Text(child[1]);
         childNodes.push(text);
-        text[setParentNode](element);
+        text[$parentNode] = element;
         break;
 
       case dom.NodeType.COMMENT_NODE:
         const comment = new dom.Comment(child[1]);
         childNodes.push(comment);
-        comment[setParentNode](element);
+        comment[$parentNode] = element;
         break;
 
       case dom.NodeType.DOCUMENT_NODE:
       case dom.NodeType.ELEMENT_NODE:
         const elementChild = nodesFromArray(child, ownerDocument);
         childNodes.push(elementChild);
-        elementChild[setParentNode](element);
+        elementChild[$parentNode] = element;
         break;
 
       case dom.NodeType.DOCUMENT_TYPE_NODE:
         const type = new dom.DocumentType(child[1], child[2], child[3]);
         childNodes.push(type);
-        type[setParentNode](element);
+        type[$parentNode] = element;
         break;
     }
   }
@@ -337,16 +340,10 @@ export function getElementsByClassName(
 ): DOM.HTMLCollection {
   for (const child of nodeList) {
     if (isElement(child)) {
-      let matchesCount = 0;
-
-      for (const singleClassName of classNames) {
-        if (child.classList.contains(singleClassName)) {
-          matchesCount++;
-        }
+      if (!child.hasAttribute("class")) {
+        continue;
       }
-
-      // ensure that all class names are present
-      if (matchesCount === classNames.length) {
+      if (classNames.every((className) => child.classList.contains(className))) {
         search.push(child);
       }
 
@@ -368,6 +365,46 @@ export function toDataAttrName(name: string): `data-${string}` {
 
 const DATASET_PROP_REGEX = /(-\w)/g;
 export function toDataPropName(name: string): string {
-  // Remove data- and convert to camelCase
   return name.slice(5).replaceAll(DATASET_PROP_REGEX, (match) => match.slice(1).toUpperCase());
+}
+
+export function checkAncestor(parent: DOM.Node, nodes: (DOM.Node | string)[]) {
+  if (nodes.some((node) => node instanceof dom.Node && node !== parent && node.contains(parent))) {
+    throw new DOMException("The new child is an ancestor of the parent");
+  }
+}
+
+export class ArrayLike<T> extends Array<T> {
+  [$onChange]?: () => void;
+
+  push(...items: T[]) {
+    const result = super.push(...items);
+    this[$onChange]?.();
+    return result;
+  }
+
+  unshift(...items: T[]) {
+    const result = super.unshift(...items);
+    this[$onChange]?.();
+    return result;
+  }
+
+  splice(start: number, deleteCount: number, ...items: T[]) {
+    const result = super.splice(start, deleteCount, ...items);
+    this[$onChange]?.();
+    return result;
+  }
+}
+
+export function reactive(callback: (value: string | null) => void) {
+  let value: string | null = null;
+  let changing = false;
+
+  return function change(newValue: string | null) {
+    if (changing || value === newValue) return;
+    changing = true;
+    value = newValue;
+    callback(value);
+    changing = false;
+  };
 }

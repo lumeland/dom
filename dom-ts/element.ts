@@ -1,42 +1,57 @@
 import {
-  createClone,
+  checkAncestor,
+  $createClone,
   flatNodes,
   getElementsByClassName,
   getElementsByTagName,
   getElementsByTagNameWildcard,
   getOuterOrInnerHtml,
   nodesFromArray,
+  $ownerElement,
   parseFrag,
+  $selectorAPI,
+  $parentNode,
   type SelectorAPI,
-  selectorAPI,
-  setOwnerElement,
-  setParentNode,
+  $onChange,
+  $className,
+  reactive,
 } from "./_utils.ts";
 
 class ElementClass extends dom.ParentNode {
   #classList: DOM.DOMTokenList | null = null;
   #attributes: DOM.NamedNodeMap | null = null;
+  [$className]: (value: string | null) => void;
 
   constructor(tagName: string, attributes: [string, string][]) {
     super(tagName.toUpperCase(), dom.NodeType.ELEMENT_NODE);
+    this[$className] = reactive((newValue) => {
+      if (newValue !== null) {
+        this.setAttribute("class", newValue);
+      }
+      if (this.#classList) {
+        this.#classList.value = newValue ?? "";
+      }
+    });
 
     if (attributes.length) {
       this.attributes.push(
         ...attributes.map(([name, value]) => {
-          const attr = new dom.Attr(name, value);
-          attr[setOwnerElement](this);
+          const attr = new dom.Attr(name);
+          attr[$ownerElement] = this;
+          attr.value = value;
+
           return attr;
         }),
       );
     }
   }
 
-  [createClone](): DOM.Element {
+  [$createClone](): DOM.Element {
     return new dom.Element(this.tagName, []);
   }
 
-  get [selectorAPI](): SelectorAPI {
-    const api = this.ownerDocument?.[selectorAPI];
+  get [$selectorAPI](): SelectorAPI {
+    const api = this.ownerDocument?.[$selectorAPI];
 
     if (!api) {
       throw new Error("This node must have an owner document to use the Selector API");
@@ -52,7 +67,7 @@ class ElementClass extends dom.ParentNode {
       const clonedAttributes = new dom.NamedNodeMap();
       for (const attr of this.#attributes) {
         const clonedAttribute = attr.cloneNode();
-        clonedAttribute[setParentNode](clone);
+        clonedAttribute[$parentNode] = clone;
         clonedAttributes.push(clonedAttribute);
       }
       clone.#attributes = clonedAttributes;
@@ -61,24 +76,38 @@ class ElementClass extends dom.ParentNode {
   }
 
   get attributes(): DOM.NamedNodeMap {
-    return this.#attributes ?? (this.#attributes = new dom.NamedNodeMap());
+    if (this.#attributes) {
+      return this.#attributes;
+    }
+    this.#attributes = new dom.NamedNodeMap();
+    this.#attributes[$ownerElement] = this;
+    this.#attributes[$onChange] = () => {
+      if (this.#classList) {
+        this.#classList.value =
+          this.#attributes?.find((attr) => attr.name === "class")?.value ?? "";
+      }
+    };
+    return this.#attributes;
   }
+
   get classList(): DOMTokenList {
     if (this.#classList) {
       return this.#classList;
     }
     const classList = new dom.DOMTokenList();
     classList.value = this.getAttribute("class") ?? "";
+    classList[$onChange] = () => this[$className](classList.value);
+
     return (this.#classList = classList);
   }
   set classList(value: string) {
     this.classList.value = value;
   }
   get className(): string {
-    return this.classList.value;
+    return this.getAttribute("class") ?? "";
   }
   set className(value: string) {
-    this.classList.value = value;
+    this.setAttribute("class", value);
   }
   get localName(): string {
     return this.tagName.toLowerCase();
@@ -113,7 +142,7 @@ class ElementClass extends dom.ParentNode {
     const childNodes = this.childNodes;
 
     for (const child of childNodes) {
-      child[setParentNode](null);
+      child[$parentNode] = null;
     }
     childNodes.splice(0, childNodes.length);
 
@@ -125,14 +154,14 @@ class ElementClass extends dom.ParentNode {
     const nodes = Array.from(nodesFromArray(parsed, this.ownerDocument).childNodes[0].childNodes);
 
     for (const child of nodes) {
-      child[setParentNode](this);
+      child[$parentNode] = this;
     }
     childNodes.push(...nodes);
   }
   get outerHTML(): string {
     return getOuterOrInnerHtml(this, true);
   }
-  set outerHTML(value: string) {
+  set outerHTML(value: string | null) {
     const parentNode = this.parentNode;
 
     if (!parentNode) {
@@ -149,15 +178,15 @@ class ElementClass extends dom.ParentNode {
         ? "body"
         : parentElement?.localName;
 
-    const parsed = JSON.parse(parseFrag(value, contextLocalName));
+    const parsed = JSON.parse(parseFrag(value ?? "", contextLocalName));
     const nodes = Array.from(nodesFromArray(parsed, this.ownerDocument).childNodes[0].childNodes);
 
     for (const child of nodes) {
-      child[setParentNode](parentNode);
+      child[$parentNode] = parentNode;
     }
 
     parentNode.childNodes.splice(parentNode.childNodes.indexOf(this), 1, ...nodes);
-    this[setParentNode](null);
+    this[$parentNode] = null;
   }
   get slot(): string {
     throw new Error("to-do");
@@ -182,16 +211,14 @@ class ElementClass extends dom.ParentNode {
     return null;
   }
   getAttribute(qualifiedName: string): string | null {
-    if (qualifiedName === "class" && this.#classList) {
-      return this.#classList.value;
-    }
     return this.#attributes?.getNamedItem(qualifiedName)?.value ?? null;
   }
   getAttributeNS(namespace: string | null, localName: string): string | null {
     throw new Error("to-do");
   }
   getAttributeNames(): string[] {
-    return this.#attributes?.map((attr) => attr.name) ?? [];
+    const names = this.#attributes?.map((attr) => attr.name);
+    return names ? Array.from(names) : [];
   }
   getAttributeNode(qualifiedName: string): DOM.Attr | null {
     return this.#attributes?.getNamedItem(qualifiedName) ?? null;
@@ -266,10 +293,12 @@ class ElementClass extends dom.ParentNode {
     throw new Error("to-do");
   }
   matches(selectors: string): boolean {
-    return this[selectorAPI].match(selectors, this);
+    return this[$selectorAPI].match(selectors, this);
   }
   removeAttribute(qualifiedName: string): void {
-    this.attributes.removeNamedItem(qualifiedName);
+    if (this.hasAttribute(qualifiedName)) {
+      this.attributes.removeNamedItem(qualifiedName);
+    }
   }
   removeAttributeNS(namespace: string | null, localName: string): void {
     throw new Error("to-do");
@@ -278,16 +307,15 @@ class ElementClass extends dom.ParentNode {
     throw new Error("to-do");
   }
   setAttribute(qualifiedName: string, value: string): void {
-    if (qualifiedName === "class" && this.#classList) {
-      this.#classList.value = value;
-    }
     const existing = this.attributes.getNamedItem(qualifiedName);
+
     if (existing) {
       existing.value = String(value);
       return;
     }
-    const attr = new dom.Attr(qualifiedName, String(value));
-    attr[setOwnerElement](this);
+    const attr = new dom.Attr(qualifiedName);
+    attr[$ownerElement] = this;
+    attr.value = String(value);
     this.attributes.push(attr);
   }
   setAttributeNS(namespace: string | null, qualifiedName: string, value: string): void {
@@ -337,6 +365,7 @@ class ElementClass extends dom.ParentNode {
       return;
     }
 
+    checkAncestor(this, nodes);
     const allNodes = flatNodes(nodes);
 
     for (const node of allNodes) {
@@ -348,7 +377,7 @@ class ElementClass extends dom.ParentNode {
       if (oldSiblings) {
         oldSiblings.splice(oldSiblings.indexOf(node), 1);
       }
-      node[setParentNode](parentNode);
+      node[$parentNode] = parentNode;
     }
 
     if (allNodes.includes(this)) {
@@ -364,6 +393,7 @@ class ElementClass extends dom.ParentNode {
       return;
     }
 
+    checkAncestor(this, nodes);
     const allNodes = flatNodes(nodes);
 
     for (const node of allNodes) {
@@ -375,7 +405,7 @@ class ElementClass extends dom.ParentNode {
       if (oldSiblings) {
         oldSiblings.splice(oldSiblings.indexOf(node), 1);
       }
-      node[setParentNode](parentNode);
+      node[$parentNode] = parentNode;
     }
 
     if (allNodes.includes(this)) {
@@ -391,7 +421,7 @@ class ElementClass extends dom.ParentNode {
     }
 
     siblings.splice(siblings.indexOf(this), 1);
-    this[setParentNode](null);
+    this[$parentNode] = null;
   }
   replaceWith(...nodes: (DOM.Node | string)[]): void {
     const parentNode = this.parentNode;
@@ -400,11 +430,12 @@ class ElementClass extends dom.ParentNode {
       return;
     }
 
+    checkAncestor(this, nodes);
     const allNodes = flatNodes(nodes);
-    this[setParentNode](null);
+    this[$parentNode] = null;
 
     for (const node of allNodes) {
-      node[setParentNode](parentNode);
+      node[$parentNode] = parentNode;
 
       if (node !== this) {
         const oldSiblings = node.parentNode?.childNodes;

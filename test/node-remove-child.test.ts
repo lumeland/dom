@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { DOMParser, Node } from "../mod.ts";
+import { DOMParser } from "../mod.ts";
 
 describe("Remove child", () => {
   it("Node.removeChild", () => {
@@ -29,7 +29,7 @@ describe("Remove child", () => {
       parent.removeChild(child);
     }).toThrow(DOMException);
     expect(() => {
-      parent.removeChild(null as any as Node);
-    }).toThrow(TypeError);
+      parent.removeChild(null as any as DOM.Node);
+    }).toThrow(DOMException);
   });
 });

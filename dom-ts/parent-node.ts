@@ -1,9 +1,9 @@
-import { flatNodes, type SelectorAPI, selectorAPI, setParentNode } from "./_utils.ts";
+import { checkAncestor, flatNodes, type SelectorAPI, $selectorAPI, $parentNode } from "./_utils.ts";
 
 abstract class ParentNodeClass extends dom.Node {
   #children: DOM.HTMLCollection | null = null;
 
-  abstract get [selectorAPI](): SelectorAPI;
+  abstract get [$selectorAPI](): SelectorAPI;
 
   get childElementCount(): number {
     return this.children.length;
@@ -21,6 +21,8 @@ abstract class ParentNodeClass extends dom.Node {
     return length ? this.children[this.children.length - 1] : null;
   }
   append(...nodes: (DOM.Node | string)[]): void {
+    checkAncestor(this, nodes);
+
     const allNodes = flatNodes(nodes);
 
     for (const node of allNodes) {
@@ -28,7 +30,7 @@ abstract class ParentNodeClass extends dom.Node {
       if (oldSiblings) {
         oldSiblings.splice(oldSiblings.indexOf(node), 1);
       }
-      node[setParentNode](this);
+      node[$parentNode] = this;
     }
 
     this.childNodes.push(...allNodes);
@@ -44,16 +46,16 @@ abstract class ParentNodeClass extends dom.Node {
       if (oldSiblings) {
         oldSiblings.splice(oldSiblings.indexOf(node), 1);
       }
-      node[setParentNode](this);
+      node[$parentNode] = this;
     }
 
     this.childNodes.unshift(...allNodes);
   }
   querySelector<E extends DOM.Element = DOM.HTMLElement>(selectors: string): E | null {
-    return this[selectorAPI].first(selectors, this as unknown as DOM.Element) as E;
+    return this[$selectorAPI].first(selectors, this as unknown as DOM.Element) as E;
   }
   querySelectorAll<E extends DOM.Element = DOM.HTMLElement>(selectors: string): DOM.NodeList<E> {
-    const result = this[selectorAPI].select(selectors, this as unknown as DOM.Element);
+    const result = this[$selectorAPI].select(selectors, this as unknown as DOM.Element);
     return new dom.NodeList(...result) as DOM.NodeList<E>;
   }
   replaceChildren(...nodes: (DOM.Node | string)[]): void {

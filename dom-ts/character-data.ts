@@ -1,4 +1,4 @@
-import { createClone, flatNodes, setParentNode } from "./_utils.ts";
+import { $createClone, flatNodes, $parentNode } from "./_utils.ts";
 
 class CharacterDataClass extends dom.Node {
   #nodeValue: string;
@@ -8,7 +8,7 @@ class CharacterDataClass extends dom.Node {
     this.#nodeValue = String(data);
   }
 
-  [createClone](): DOM.CharacterData {
+  [$createClone](): DOM.CharacterData {
     return new dom.CharacterData(this.data, this.nodeName, this.nodeType, null);
   }
 
@@ -69,7 +69,7 @@ class CharacterDataClass extends dom.Node {
       if (oldSiblings) {
         oldSiblings.splice(oldSiblings.indexOf(node), 1);
       }
-      node[setParentNode](parentNode);
+      node[parentNode](parentNode);
     }
 
     const index = thisSiblings.indexOf(this) + 1;
@@ -94,7 +94,7 @@ class CharacterDataClass extends dom.Node {
       if (oldSiblings) {
         oldSiblings.splice(oldSiblings.indexOf(node), 1);
       }
-      node[setParentNode](parentNode);
+      node[$parentNode] = parentNode;
     }
 
     thisSiblings.splice(thisSiblings.indexOf(this), 0, ...allNodes);
@@ -116,10 +116,10 @@ class CharacterDataClass extends dom.Node {
       if (oldSiblings) {
         oldSiblings.splice(oldSiblings.indexOf(node), 1);
       }
-      node[setParentNode](parentNode);
+      node[$parentNode] = parentNode;
     }
 
-    this[setParentNode](null);
+    this[$parentNode] = null;
     thisSiblings.splice(thisSiblings.indexOf(this), 1, ...allNodes);
   }
 }

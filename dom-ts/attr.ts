@@ -1,20 +1,28 @@
-import { createClone, setOwnerElement } from "./_utils.ts";
+import { $className, $createClone, $ownerElement } from "./_utils.ts";
 
 class AttrClass extends dom.Node {
   #ownerElement: DOM.Element | null = null;
-  value: string;
+  #value = "";
 
-  constructor(name: string, value: string) {
+  constructor(name: string) {
     super(name, dom.NodeType.ATTRIBUTE_NODE);
-    this.value = value;
   }
 
-  [createClone](): DOM.Attr {
-    return new dom.Attr(this.name, this.value);
+  [$createClone](): DOM.Attr {
+    const attr = new dom.Attr(this.name);
+    attr.value = this.#value;
+    return attr;
   }
 
   get localName(): string {
     throw new Error("to-do");
+  }
+  set value(value: string) {
+    if (this.name === "class") this[$ownerElement]?.[$className](value);
+    this.#value = value;
+  }
+  get value(): string {
+    return this.#value;
   }
   get name(): string {
     return this.nodeName;
@@ -22,7 +30,7 @@ class AttrClass extends dom.Node {
   get namespaceURI(): string | null {
     throw new Error("to-do");
   }
-  [setOwnerElement](element: DOM.Element | null) {
+  set [$ownerElement](element: DOM.Element | null) {
     this.#ownerElement = element;
   }
   get ownerElement(): DOM.Element | null {
@@ -35,10 +43,10 @@ class AttrClass extends dom.Node {
     return true;
   }
   get textContent(): string {
-    return this.value;
+    return this.#value;
   }
   set textContent(value: string | null) {
-    this.value = value ?? "";
+    this.#value = value ?? "";
   }
   override appendChild<T extends DOM.Node>(): T {
     throw new DOMException("Cannot add children to an Attribute");

@@ -72,6 +72,7 @@ describe("Named node map", () => {
     // Remove classname attr node
     const classNameAttr = div.attributes.removeNamedItem("class");
     expect(classNameAttr.ownerElement).toBeNull();
+
     expect(div.attributes.getNamedItem("class")).toBeNull();
 
     expect(() => {

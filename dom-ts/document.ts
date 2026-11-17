@@ -1,13 +1,13 @@
 import {
-  createClone,
+  $createClone,
   createSelector,
   getElementById,
   getElementsByClassName,
   getElementsByTagName,
   getElementsByTagNameWildcard,
-  selectorAPI,
+  $selectorAPI,
+  $ownerDocument,
   type SelectorAPI,
-  setOwnerDocument,
 } from "./_utils.ts";
 
 export class DocumentClass extends dom.ParentNode {
@@ -50,7 +50,7 @@ export class DocumentClass extends dom.ParentNode {
     //this.implementation = new DOMImplementation();
   }
 
-  get [selectorAPI](): SelectorAPI {
+  get [$selectorAPI](): SelectorAPI {
     return this.#selector ?? (this.#selector = createSelector(this));
   }
 
@@ -185,15 +185,15 @@ export class DocumentClass extends dom.ParentNode {
   }
   createComment(data: string): DOM.Comment {
     const comment = new dom.Comment(data);
-    comment[setOwnerDocument](this);
+    comment[$ownerDocument] = this;
     return comment;
   }
   createDocumentFragment(): DOM.DocumentFragment {
     const fragment = new dom.DocumentFragment();
-    fragment[setOwnerDocument](this);
+    fragment[$ownerDocument] = this;
     return fragment;
   }
-  [createClone](): DOM.Document {
+  [$createClone](): DOM.Document {
     return new dom.Document();
   }
   createElement(tagName: "template"): DOM.HTMLTemplateElement;
@@ -205,13 +205,13 @@ export class DocumentClass extends dom.ParentNode {
       case "TEMPLATE": {
         const content = new dom.DocumentFragment();
         const element = new dom.HTMLTemplateElement([], content);
-        element[setOwnerDocument](this);
+        element[$ownerDocument] = this;
         return element;
       }
 
       default: {
         const element = new dom.HTMLElement(tagName, []);
-        element[setOwnerDocument](this);
+        element[$ownerDocument] = this;
         return element;
       }
     }
@@ -247,7 +247,7 @@ export class DocumentClass extends dom.ParentNode {
   }
   createTextNode(data: string): DOM.Text {
     const node = new dom.Text(data);
-    node[setOwnerDocument](this.ownerDocument);
+    node[$ownerDocument] = this.ownerDocument;
     return node;
   }
   getElementById(elementId: string): DOM.HTMLElement | null {
