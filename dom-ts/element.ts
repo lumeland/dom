@@ -25,7 +25,7 @@ class ElementClass extends dom.ParentNode {
   constructor(tagName: string, attributes: [string, string][]) {
     super(tagName.toUpperCase(), dom.NodeType.ELEMENT_NODE);
     this[$className] = reactive((newValue) => {
-      if (newValue !== null) {
+      if (newValue !== null && (newValue !== "" || this.hasAttribute(newValue))) {
         this.setAttribute("class", newValue);
       }
       if (this.#classList) {
@@ -233,15 +233,6 @@ class ElementClass extends dom.ParentNode {
       new dom.HTMLCollection(),
     );
   }
-  getElementsByTagName<K extends keyof HTMLElementTagNameMap>(
-    qualifiedName: K,
-  ): DOM.HTMLCollectionOf<HTMLElementTagNameMap[K]>;
-  getElementsByTagName<K extends keyof SVGElementTagNameMap>(
-    qualifiedName: K,
-  ): DOM.HTMLCollectionOf<SVGElementTagNameMap[K]>;
-  getElementsByTagName<K extends keyof MathMLElementTagNameMap>(
-    qualifiedName: K,
-  ): DOM.HTMLCollectionOf<MathMLElementTagNameMap[K]>;
   getElementsByTagName(qualifiedName: string): DOM.HTMLCollectionOf<DOM.Element> {
     if (qualifiedName === "*") {
       return getElementsByTagNameWildcard(this.childNodes, new dom.HTMLCollection());
@@ -253,18 +244,6 @@ class ElementClass extends dom.ParentNode {
       new dom.HTMLCollection(),
     );
   }
-  getElementsByTagNameNS(
-    namespaceURI: "http://www.w3.org/1999/xhtml",
-    localName: string,
-  ): DOM.HTMLCollectionOf<DOM.HTMLElement>;
-  getElementsByTagNameNS(
-    namespaceURI: "http://www.w3.org/2000/svg",
-    localName: string,
-  ): DOM.HTMLCollectionOf<SVGElement>;
-  getElementsByTagNameNS(
-    namespaceURI: "http://www.w3.org/1998/Math/MathML",
-    localName: string,
-  ): DOM.HTMLCollectionOf<MathMLElement>;
   getElementsByTagNameNS(
     namespace: string | null,
     localName: string,

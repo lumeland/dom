@@ -1,4 +1,4 @@
-import { $createClone, type SelectorAPI, $selectorAPI } from "./_utils.ts";
+import { $createClone, type SelectorAPI, $selectorAPI, getElementById } from "./_utils.ts";
 
 class DocumentFragmentClass extends dom.ParentNode {
   constructor() {
@@ -27,7 +27,7 @@ class DocumentFragmentClass extends dom.ParentNode {
   }
 
   getElementById(elementId: string): DOM.HTMLElement | null {
-    throw new Error("to-do");
+    return getElementById(this.childNodes, elementId);
   }
 }
 

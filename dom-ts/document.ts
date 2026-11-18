@@ -251,11 +251,11 @@ export class DocumentClass extends dom.ParentNode {
     return node;
   }
   getElementById(elementId: string): DOM.HTMLElement | null {
-    return getElementById(this.documentElement.childNodes, elementId);
+    return getElementById(this.childNodes, elementId);
   }
   getElementsByClassName(classNames: string): DOM.HTMLCollectionOf<DOM.Element> {
     return getElementsByClassName(
-      this.documentElement.childNodes,
+      this.childNodes,
       classNames.trim().split(/\s+/),
       new dom.HTMLCollection(),
     );
@@ -263,15 +263,6 @@ export class DocumentClass extends dom.ParentNode {
   getElementsByName(elementName: string): DOM.NodeList<DOM.HTMLElement> {
     throw new Error("to-do");
   }
-  getElementsByTagName<K extends keyof HTMLElementTagNameMap>(
-    qualifiedName: K,
-  ): HTMLCollectionOf<HTMLElementTagNameMap[K]>;
-  getElementsByTagName<K extends keyof SVGElementTagNameMap>(
-    qualifiedName: K,
-  ): HTMLCollectionOf<SVGElementTagNameMap[K]>;
-  getElementsByTagName<K extends keyof MathMLElementTagNameMap>(
-    qualifiedName: K,
-  ): HTMLCollectionOf<MathMLElementTagNameMap[K]>;
   getElementsByTagName(qualifiedName: string): DOM.HTMLCollectionOf<DOM.Element> {
     if (qualifiedName === "*") {
       return getElementsByTagNameWildcard(this.childNodes, new dom.HTMLCollection());
@@ -283,18 +274,6 @@ export class DocumentClass extends dom.ParentNode {
       new dom.HTMLCollection(),
     );
   }
-  getElementsByTagNameNS(
-    namespaceURI: "http://www.w3.org/1999/xhtml",
-    localName: string,
-  ): DOM.HTMLCollectionOf<DOM.HTMLElement>;
-  getElementsByTagNameNS(
-    namespaceURI: "http://www.w3.org/2000/svg",
-    localName: string,
-  ): DOM.HTMLCollectionOf<DOM.SVGElement>;
-  getElementsByTagNameNS(
-    namespaceURI: "http://www.w3.org/1998/Math/MathML",
-    localName: string,
-  ): DOM.HTMLCollectionOf<MathMLElement>;
   getElementsByTagNameNS(
     namespace: string | null,
     localName: string,

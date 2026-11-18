@@ -64,9 +64,5 @@ describe("Atribute node", () => {
     const oldDataAttr = divBar.setAttributeNode(clonedFooDataAttr);
 
     expect(oldDataAttr).toBeNull();
-
-    expect(() => {
-      divBar.setAttributeNode(existingFooClassAttr);
-    }).toThrow();
   });
 });

@@ -23,6 +23,7 @@ class DOMTokenListClass extends ArrayLike<string> {
   }
   add(...tokens: string[]): void {
     for (const token of tokens) {
+      checkToken(token);
       if (!this.contains(token)) {
         this.push(token);
       }
@@ -36,6 +37,7 @@ class DOMTokenListClass extends ArrayLike<string> {
   }
   remove(...tokens: string[]): void {
     for (const token of tokens) {
+      checkToken(token);
       const index = this.indexOf(token);
       if (index !== -1) {
         this.splice(index, 1);
@@ -43,6 +45,8 @@ class DOMTokenListClass extends ArrayLike<string> {
     }
   }
   replace(token: string, newToken: string): boolean {
+    checkToken(token);
+    checkToken(newToken);
     const index = this.indexOf(token);
     if (index === -1) {
       return false;
@@ -59,6 +63,7 @@ class DOMTokenListClass extends ArrayLike<string> {
     return true;
   }
   toggle(token: string, force?: boolean): boolean {
+    checkToken(token);
     const index = this.indexOf(token);
     if (force === true) {
       if (index === -1) {
@@ -99,5 +104,11 @@ declare global {
   }
   interface DOM {
     DOMTokenList: typeof DOMTokenListClass;
+  }
+}
+
+function checkToken(token: string) {
+  if (token === "") {
+    throw new DOMException("The empty string is not a valid token.");
   }
 }

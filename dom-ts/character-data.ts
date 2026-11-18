@@ -9,7 +9,7 @@ class CharacterDataClass extends dom.Node {
   }
 
   [$createClone](): DOM.CharacterData {
-    return new dom.CharacterData(this.data, this.nodeName, this.nodeType, null);
+    return new dom.CharacterData(this.data, this.nodeName, this.nodeType);
   }
 
   get length() {
@@ -20,7 +20,7 @@ class CharacterDataClass extends dom.Node {
     return this.#nodeValue ?? "";
   }
 
-  set nodeValue(value: unknown) {
+  set nodeValue(value: any) {
     this.#nodeValue = String(value ?? "");
   }
 
@@ -69,7 +69,7 @@ class CharacterDataClass extends dom.Node {
       if (oldSiblings) {
         oldSiblings.splice(oldSiblings.indexOf(node), 1);
       }
-      node[parentNode](parentNode);
+      node[$parentNode] = parentNode;
     }
 
     const index = thisSiblings.indexOf(this) + 1;
