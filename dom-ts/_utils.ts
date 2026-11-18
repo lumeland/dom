@@ -121,7 +121,9 @@ export function nodesFromArray(
       child[$parentNode] = contentFrag;
     }
 
-    return new dom.HTMLTemplateElement(attributes, contentFrag);
+    const element = new dom.HTMLTemplateElement(attributes, contentFrag);
+    element[$ownerDocument] = ownerDocument;
+    return element;
   }
 
   const ElementConstructor = dom.elements.get(nodeName) ?? dom.HTMLElement;
@@ -340,11 +342,10 @@ export function getElementsByClassName(
 ): DOM.HTMLCollection {
   for (const child of nodeList) {
     if (isElement(child)) {
-      if (!child.hasAttribute("class")) {
-        continue;
-      }
-      if (classNames.every((className) => child.classList.contains(className))) {
-        search.push(child);
+      if (child.hasAttribute("class")) {
+        if (classNames.every((className) => child.classList.contains(className))) {
+          search.push(child);
+        }
       }
 
       getElementsByClassName(child.childNodes, classNames, search);
@@ -396,14 +397,12 @@ export class ArrayLike<T> extends Array<T> {
   }
 }
 
-export function reactive(callback: (value: string | null) => void) {
-  let value: string | null = null;
+export function reactive(callback: (value: unknown) => void) {
   let changing = false;
 
-  return function change(newValue: string | null) {
-    if (changing || value === newValue) return;
+  return function change(value: unknown) {
+    if (changing) return;
     changing = true;
-    value = newValue;
     callback(value);
     changing = false;
   };

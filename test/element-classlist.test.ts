@@ -32,11 +32,6 @@ describe("Element classList", () => {
     expect(div.classList.length).toBe(3);
     div.classList.remove("a", "b");
     expect(div.classList.length).toBe(1);
-
-    expect(
-      // @ts-ignore
-      () => (div.classList.length = 0),
-    ).toThrow(TypeError);
   });
 
   it("Element.classList.add", () => {

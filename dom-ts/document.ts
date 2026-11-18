@@ -217,28 +217,6 @@ export class DocumentClass extends dom.ParentNode {
     }
   }
   createElementNS(
-    namespaceURI: "http://www.w3.org/1999/xhtml",
-    qualifiedName: string,
-  ): DOM.HTMLElement;
-  createElementNS<K extends keyof SVGElementTagNameMap>(
-    namespaceURI: "http://www.w3.org/2000/svg",
-    qualifiedName: K,
-  ): SVGElementTagNameMap[K];
-  createElementNS(namespaceURI: "http://www.w3.org/2000/svg", qualifiedName: string): SVGElement;
-  createElementNS<K extends keyof MathMLElementTagNameMap>(
-    namespaceURI: "http://www.w3.org/1998/Math/MathML",
-    qualifiedName: K,
-  ): MathMLElementTagNameMap[K];
-  createElementNS(
-    namespaceURI: "http://www.w3.org/1998/Math/MathML",
-    qualifiedName: string,
-  ): MathMLElement;
-  createElementNS(
-    namespaceURI: string | null,
-    qualifiedName: string,
-    options?: ElementCreationOptions,
-  ): DOM.Element;
-  createElementNS(
     namespace: string | null,
     qualifiedName: string,
     options?: string | ElementCreationOptions,

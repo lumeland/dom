@@ -18,10 +18,10 @@ class AttrClass extends dom.Node {
     throw new Error("to-do");
   }
   set value(value: string) {
-    if (this.name === "class") {
-      this.ownerElement?.[$className](value);
-    }
     this.#value = value;
+    if (this.name === "class") {
+      this.ownerElement?.[$className]?.(this);
+    }
   }
   get value(): string {
     return this.#value;

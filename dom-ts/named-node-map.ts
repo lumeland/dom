@@ -1,4 +1,4 @@
-import { $className, $ownerElement, ArrayLike } from "./_utils.ts";
+import { $ownerElement, ArrayLike } from "./_utils.ts";
 
 class NamedNodeMapClass extends ArrayLike<DOM.Attr> {
   #ownerElement: DOM.Element | null = null;
@@ -30,7 +30,6 @@ class NamedNodeMapClass extends ArrayLike<DOM.Attr> {
     }
     const item = this.splice(index, 1)[0];
     item[$ownerElement] = null;
-    if (qualifiedName === "class") this.#ownerElement?.[$className](null);
     return item;
   }
   removeNamedItemNS(namespace: string | null, localName: string): DOM.Attr {
@@ -43,7 +42,6 @@ class NamedNodeMapClass extends ArrayLike<DOM.Attr> {
     }
     attr[$ownerElement] = this.#ownerElement;
     this.push(attr);
-    if (attr.name === "class") this.#ownerElement?.[$className](attr.value);
     return existing ?? null;
   }
   setNamedItemNS(attr: DOM.Attr): DOM.Attr | null {

@@ -45,6 +45,9 @@ class DOMTokenListClass extends ArrayLike<string> {
     }
   }
   replace(token: string, newToken: string): boolean {
+    if (token === newToken) {
+      return false;
+    }
     checkToken(token);
     checkToken(newToken);
     const index = this.indexOf(token);
@@ -55,7 +58,7 @@ class DOMTokenListClass extends ArrayLike<string> {
     if (this.includes(newToken)) {
       this.splice(index, 1);
     } else {
-      this[index] = newToken;
+      this.splice(index, 1, newToken);
     }
     return true;
   }

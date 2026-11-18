@@ -245,9 +245,9 @@ class NodeClass extends EventTarget {
     return this === otherNode;
   }
 
-  cloneNode(subtree?: boolean): typeof this {
+  cloneNode(subtree?: boolean): DOM.Node {
     const clone = this[$createClone]();
-    clone.#ownerDocument = this.#ownerDocument;
+    clone[$ownerDocument] = this.#ownerDocument;
 
     if (subtree && this.#childNodes) {
       for (const child of this.childNodes) {

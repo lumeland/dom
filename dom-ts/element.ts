@@ -20,18 +20,10 @@ import {
 class ElementClass extends dom.ParentNode {
   #classList: DOM.DOMTokenList | null = null;
   #attributes: DOM.NamedNodeMap | null = null;
-  [$className]: (value: string | null) => void;
+  [$className]?: (value: unknown) => void;
 
   constructor(tagName: string, attributes: [string, string][]) {
     super(tagName.toUpperCase(), dom.NodeType.ELEMENT_NODE);
-    this[$className] = reactive((newValue) => {
-      if (newValue !== null && (newValue !== "" || this.hasAttribute(newValue))) {
-        this.setAttribute("class", newValue);
-      }
-      if (this.#classList) {
-        this.#classList.value = newValue ?? "";
-      }
-    });
 
     if (attributes.length) {
       this.attributes.push(
@@ -44,6 +36,29 @@ class ElementClass extends dom.ParentNode {
         }),
       );
     }
+
+    this[$className] = reactive((from) => {
+      // Changed from classList
+      if (from instanceof dom.DOMTokenList) {
+        this.setAttribute("class", from.value);
+        return;
+      }
+
+      // Changed from attributes
+      if (from instanceof dom.NamedNodeMap) {
+        if (this.#classList) {
+          this.#classList.value = from.getNamedItem("class")?.value ?? "";
+        }
+        return;
+      }
+
+      // Changed from the "class" Attr
+      if (from instanceof dom.Attr) {
+        if (this.#classList) {
+          this.#classList.value = from.value;
+        }
+      }
+    });
   }
 
   [$createClone](): DOM.Element {
@@ -66,7 +81,7 @@ class ElementClass extends dom.ParentNode {
     if (this.#attributes) {
       const clonedAttributes = new dom.NamedNodeMap();
       for (const attr of this.#attributes) {
-        const clonedAttribute = attr.cloneNode();
+        const clonedAttribute = attr.cloneNode() as DOM.Attr;
         clonedAttribute[$parentNode] = clone;
         clonedAttributes.push(clonedAttribute);
       }
@@ -81,22 +96,17 @@ class ElementClass extends dom.ParentNode {
     }
     this.#attributes = new dom.NamedNodeMap();
     this.#attributes[$ownerElement] = this;
-    this.#attributes[$onChange] = () => {
-      if (this.#classList) {
-        this.#classList.value =
-          this.#attributes?.find((attr) => attr.name === "class")?.value ?? "";
-      }
-    };
+    this.#attributes[$onChange] = () => this[$className]?.(this.#attributes);
     return this.#attributes;
   }
 
-  get classList(): DOMTokenList {
+  get classList(): DOM.DOMTokenList {
     if (this.#classList) {
       return this.#classList;
     }
     const classList = new dom.DOMTokenList();
     classList.value = this.getAttribute("class") ?? "";
-    classList[$onChange] = () => this[$className](classList.value);
+    classList[$onChange] = () => this[$className]?.(classList);
 
     return (this.#classList = classList);
   }
@@ -254,7 +264,7 @@ class ElementClass extends dom.ParentNode {
     throw new Error("to-do");
   }
   hasAttribute(qualifiedName: string): boolean {
-    return this.#attributes?.getNamedItem(qualifiedName) !== null;
+    return !!this.#attributes?.getNamedItem(qualifiedName);
   }
   hasAttributeNS(namespace: string | null, localName: string): boolean {
     throw new Error("to-do");

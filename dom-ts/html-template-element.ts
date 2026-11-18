@@ -1,9 +1,27 @@
+import {
+  $createClone,
+  $ownerDocument,
+  $parentNode,
+  getOuterOrInnerHtml,
+  nodesFromArray,
+  parseFrag,
+} from "./_utils.ts";
+
 class HTMLTemplateElementClass extends dom.HTMLElement {
   #content: DOM.DocumentFragment;
 
   constructor(attributes: [string, string][], content: DOM.DocumentFragment) {
     super("template", attributes);
     this.#content = content;
+  }
+
+  [$createClone](): DOM.HTMLTemplateElement {
+    return new dom.HTMLTemplateElement([], new dom.DocumentFragment());
+  }
+
+  set [$ownerDocument](ownerDocument: DOM.Document | null) {
+    super[$ownerDocument] = ownerDocument;
+    this.#content[$ownerDocument] = ownerDocument;
   }
 
   cloneNode(deep = false): DOM.HTMLTemplateElement {
@@ -22,6 +40,31 @@ class HTMLTemplateElementClass extends dom.HTMLElement {
   get content(): DOM.DocumentFragment {
     return this.#content;
   }
+
+  get innerHTML(): string {
+    return getOuterOrInnerHtml(this, false);
+  }
+  set innerHTML(value: string) {
+    const childNodes = this.#content.childNodes;
+
+    for (const child of childNodes) {
+      child[$parentNode] = null;
+    }
+    childNodes.splice(0, childNodes.length);
+
+    if (!value.length) {
+      return;
+    }
+
+    const parsed = JSON.parse(parseFrag(value, this.localName));
+    const nodes = Array.from(nodesFromArray(parsed, this.ownerDocument).childNodes[0].childNodes);
+
+    for (const child of nodes) {
+      child[$parentNode] = this;
+    }
+    childNodes.push(...nodes);
+  }
+
   get shadowRootClonable(): boolean {
     throw new Error("to-do");
   }
