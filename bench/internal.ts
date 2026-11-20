@@ -1,9 +1,8 @@
 import { Bench } from "tinybench";
 import { DOMParser } from "../mod.ts";
-import { parse } from "../api/parser.ts";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
-import { nodesFromArray } from "../api/deserialize.ts";
+import { parse, nodesFromArray } from "../api/_utils.ts";
 
 const bench = new Bench();
 const code = readFileSync(fileURLToPath(import.meta.resolve("./code.html")), "utf-8");

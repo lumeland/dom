@@ -1,5 +1,6 @@
 {
-  "name": "@lumeland/dom2",
+  "name": "@lumeland/dom",
+  "version": "1.0.0",
   "description": "DOM & HTML parser in wasm",
   "author": {
     "name": "Óscar Otero"
@@ -18,7 +19,7 @@
     "css-select": "^7.0.0"
   },
   "devDependencies": {
-    "@lumeland/dom": "^0.1.56",
+    "@b-fuze/deno-dom": "jsr:^0.1.56",
     "@types/jsdom": "^30.0.0",
     "@types/node": "^26.6.6",
     "@types/nwsapi": "^2.2.7",

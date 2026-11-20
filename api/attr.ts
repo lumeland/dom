@@ -14,6 +14,10 @@ class AttrClass extends dom.Node {
     return attr;
   }
 
+  cloneNode(subtree?: boolean): DOM.Attr {
+    return super.cloneNode(subtree) as DOM.Attr;
+  }
+
   get localName(): string {
     throw new Error("to-do");
   }
