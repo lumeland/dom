@@ -6,6 +6,9 @@
     "name": "Óscar Otero"
   },
   "type": "module",
+  "exports": {
+    ".": "./mod.ts"
+  },
   "scripts": {
     "test": "vitest run --no-isolate",
     "fmt": "oxfmt .",

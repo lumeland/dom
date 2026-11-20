@@ -140,43 +140,39 @@ type HTMLTemplateElementData = [
 ];
 type Data = DocumentOrElementData | TextOrCommentData | DocumentData | HTMLTemplateElementData;
 
-function isTemplateElement(data: Data): data is HTMLTemplateElementData {
-  return data[0] === dom.NodeType.ELEMENT_NODE && data[1].toLowerCase() === "template";
-}
-
-function createHTMLElement(nodeName: string, attributes: [string, string][]): DOM.HTMLElement {
-  switch (nodeName) {
-    case "head":
-      return new dom.HTMLHeadElement(attributes);
-    default:
-      return new dom.HTMLElement(nodeName, attributes);
-  }
-}
-
-export function nodesFromArray(
+export function arrayToNode(
   data: DocumentOrElementData | HTMLTemplateElementData,
-  ownerDocument: DOM.Document | null = null,
+  ownerDocument: DOM.Document,
 ): DOM.Node {
   const [, nodeName, attributes, ...children] = data;
 
-  if (isTemplateElement(data)) {
-    const contentFrag = new dom.DocumentFragment();
-    contentFrag[$ownerDocument] = ownerDocument;
-    const content = nodesFromArray(data[3], ownerDocument);
-    const childNodes = contentFrag.childNodes;
+  const element = ownerDocument.createElement(nodeName);
+
+  if (attributes.length) {
+    element.attributes.push(
+      ...attributes.map(([name, value]) => {
+        const attr = new dom.Attr(name);
+        attr[$ownerElement] = element;
+        attr.value = value;
+
+        return attr;
+      }),
+    );
+  }
+
+  if (element instanceof dom.HTMLTemplateElement) {
+    const content = arrayToNode((data as HTMLTemplateElementData)[3], ownerDocument);
+    const childNodes = element.content.childNodes;
 
     for (const child of content.childNodes) {
       childNodes.push(child);
-      child[$parentNode] = contentFrag;
+      child[$parentNode] = element.content;
     }
 
-    const element = new dom.HTMLTemplateElement(attributes, contentFrag);
     element[$ownerDocument] = ownerDocument;
     return element;
   }
 
-  const element = createHTMLElement(nodeName, attributes);
-  element[$ownerDocument] = ownerDocument;
   const childNodes = element.childNodes;
 
   for (const child of children) {
@@ -195,7 +191,7 @@ export function nodesFromArray(
 
       case dom.NodeType.DOCUMENT_NODE:
       case dom.NodeType.ELEMENT_NODE:
-        const elementChild = nodesFromArray(child, ownerDocument);
+        const elementChild = arrayToNode(child, ownerDocument);
         childNodes.push(elementChild);
         elementChild[$parentNode] = element;
         break;

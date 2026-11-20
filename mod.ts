@@ -1,5 +1,5 @@
 import { dom } from "./api/dom.ts";
-import { nodesFromArray, parse } from "./api/_utils.ts";
+import { arrayToNode, parse } from "./api/_utils.ts";
 
 export { dom };
 
@@ -18,8 +18,13 @@ export class DOMParser {
 
     const document = new dom.HTMLDocument();
     const parsed = JSON.parse(parse(source));
-    const nodes = nodesFromArray(parsed, document);
-    dom.HTMLDocument.fillNodes(document, nodes);
+    const nodes = arrayToNode(parsed, document);
+    document.append(...nodes.childNodes);
+
+    if (!document.doctype) {
+      document.prepend(new dom.DocumentType("html", "", ""));
+    }
+
     return document;
   }
 }

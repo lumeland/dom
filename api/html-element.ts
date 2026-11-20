@@ -4,7 +4,7 @@ class HTMLElementClass extends dom.Element {
   #dataset: Record<string, string | undefined> | null = null;
 
   [$createClone](): DOM.HTMLElement {
-    return new dom.HTMLElement(this.tagName, []);
+    return new dom.HTMLElement(this.tagName);
   }
 
   get accessKey(): string {

@@ -3,20 +3,20 @@ import {
   $ownerDocument,
   $parentNode,
   getOuterOrInnerHtml,
-  nodesFromArray,
+  arrayToNode,
   parseFrag,
 } from "./_utils.ts";
 
 class HTMLTemplateElementClass extends dom.HTMLElement {
   #content: DOM.DocumentFragment;
 
-  constructor(attributes: [string, string][], content: DOM.DocumentFragment) {
-    super("template", attributes);
+  constructor(content: DOM.DocumentFragment) {
+    super("template");
     this.#content = content;
   }
 
   [$createClone](): DOM.HTMLTemplateElement {
-    return new dom.HTMLTemplateElement([], new dom.DocumentFragment());
+    return new dom.HTMLTemplateElement(new dom.DocumentFragment());
   }
 
   set [$ownerDocument](ownerDocument: DOM.Document | null) {
@@ -57,7 +57,7 @@ class HTMLTemplateElementClass extends dom.HTMLElement {
     }
 
     const parsed = JSON.parse(parseFrag(value, this.localName));
-    const nodes = nodesFromArray(parsed, this.ownerDocument).childNodes[0].childNodes;
+    const nodes = arrayToNode(parsed, this.ownerDocument!).childNodes[0].childNodes;
 
     for (const child of nodes) {
       child[$parentNode] = this;

@@ -8,27 +8,6 @@ import {
 } from "./_utils.ts";
 
 export class DocumentClass extends dom.ParentNode {
-  static fillNodes(document: DOM.HTMLDocument, node: DOM.Node) {
-    for (const child of Array.from(node.childNodes)) {
-      document.appendChild(child);
-
-      if (child instanceof dom.DocumentType) {
-        document.#doctype = child;
-        continue;
-      }
-    }
-
-    if (!document.#doctype) {
-      const docType = new dom.DocumentType("html", "", "");
-      if (document.childNodes.length === 0) {
-        document.appendChild(docType);
-      } else {
-        document.insertBefore(docType, document.childNodes[0]);
-      }
-    }
-  }
-
-  #doctype: DOM.DocumentType | null = null;
   #implementation: DOM.DOMImplementation | null = null;
 
   vlinkColor: string = "";
@@ -99,8 +78,12 @@ export class DocumentClass extends dom.ParentNode {
   get currentScript(): HTMLOrSVGScriptElement | null {
     throw new Error("to-do");
   }
-  get doctype(): DocumentType | null {
-    throw new Error("to-do");
+  get doctype(): DOM.DocumentType | null {
+    return (
+      (this.childNodes.find(
+        (node) => node.nodeType === dom.NodeType.DOCUMENT_TYPE_NODE,
+      ) as DOM.DocumentType) ?? null
+    );
   }
   get documentElement(): DOM.HTMLElement {
     return this.childNodes.find(
@@ -198,14 +181,19 @@ export class DocumentClass extends dom.ParentNode {
 
     switch (tagName) {
       case "TEMPLATE": {
-        const content = new dom.DocumentFragment();
-        const element = new dom.HTMLTemplateElement([], content);
+        const element = new dom.HTMLTemplateElement(new dom.DocumentFragment());
+        element[$ownerDocument] = this;
+        return element;
+      }
+
+      case "HEAD": {
+        const element = new dom.HTMLHeadElement();
         element[$ownerDocument] = this;
         return element;
       }
 
       default: {
-        const element = new dom.HTMLElement(tagName, []);
+        const element = new dom.HTMLElement(tagName);
         element[$ownerDocument] = this;
         return element;
       }

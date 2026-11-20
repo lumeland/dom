@@ -2,7 +2,7 @@ import { Bench } from "tinybench";
 import { DOMParser } from "../mod.ts";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
-import { parse, nodesFromArray } from "../api/_utils.ts";
+import { parse, arrayToNode } from "../api/_utils.ts";
 
 const bench = new Bench();
 const code = readFileSync(fileURLToPath(import.meta.resolve("./code.html")), "utf-8");
@@ -14,7 +14,7 @@ bench.add("Only parse", () => {
 });
 
 bench.add("Only deserialize", () => {
-  nodesFromArray(parsedCode);
+  arrayToNode(parsedCode, new dom.HTMLDocument());
 });
 
 bench.add("Full DOM parse", () => {

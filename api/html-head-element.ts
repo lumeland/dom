@@ -1,6 +1,6 @@
 class HTMLHeadElementClass extends dom.HTMLElement {
-  constructor(attributes: [string, string][]) {
-    super("HEAD", attributes);
+  constructor() {
+    super("HEAD");
   }
 }
 

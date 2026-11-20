@@ -6,7 +6,7 @@ import {
   getElementsByTagName,
   getElementsByTagNameWildcard,
   getOuterOrInnerHtml,
-  nodesFromArray,
+  arrayToNode,
   $ownerElement,
   parseFrag,
   $parentNode,
@@ -21,20 +21,8 @@ class ElementClass extends dom.ParentNode {
   #attributes: DOM.NamedNodeMap | null = null;
   [$className]?: (value: unknown) => void;
 
-  constructor(tagName: string, attributes: [string, string][]) {
+  constructor(tagName: string) {
     super(tagName.toUpperCase(), dom.NodeType.ELEMENT_NODE);
-
-    if (attributes.length) {
-      this.attributes.push(
-        ...attributes.map(([name, value]) => {
-          const attr = new dom.Attr(name);
-          attr[$ownerElement] = this;
-          attr.value = value;
-
-          return attr;
-        }),
-      );
-    }
 
     this[$className] = reactive((from) => {
       // Changed from classList
@@ -61,7 +49,7 @@ class ElementClass extends dom.ParentNode {
   }
 
   [$createClone](): DOM.Element {
-    return new dom.Element(this.tagName, []);
+    return new dom.Element(this.tagName);
   }
 
   cloneNode(subtree?: boolean): DOM.Element {
@@ -150,7 +138,7 @@ class ElementClass extends dom.ParentNode {
     }
 
     const parsed = JSON.parse(parseFrag(value, this.localName));
-    const nodes = nodesFromArray(parsed, this.ownerDocument).childNodes[0].childNodes;
+    const nodes = arrayToNode(parsed, this.ownerDocument!).childNodes[0].childNodes;
 
     for (const child of nodes) {
       child[$parentNode] = this;
@@ -178,7 +166,7 @@ class ElementClass extends dom.ParentNode {
         : parentElement?.localName;
 
     const parsed = JSON.parse(parseFrag(value ?? "", contextLocalName));
-    const nodes = Array.from(nodesFromArray(parsed, this.ownerDocument).childNodes[0].childNodes);
+    const nodes = Array.from(arrayToNode(parsed, this.ownerDocument!).childNodes[0].childNodes);
 
     for (const child of nodes) {
       child[$parentNode] = parentNode;
