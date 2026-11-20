@@ -14,8 +14,7 @@ class NamedNodeMapClass extends ArrayLike<DOM.Attr> {
     return null;
   }
   getNamedItem(qualifiedName: string): DOM.Attr | null {
-    qualifiedName = qualifiedName.toLowerCase();
-    qualifiedName = svgAttributesAliases.get(qualifiedName) ?? qualifiedName;
+    qualifiedName = normalizeAttributeName(qualifiedName);
     return this.find((item) => item.name === qualifiedName) ?? null;
   }
   getNamedItemNS(_namespace: string | null, _localName: string): DOM.Attr | null {
@@ -25,6 +24,7 @@ class NamedNodeMapClass extends ArrayLike<DOM.Attr> {
     return this[index] ?? null;
   }
   removeNamedItem(qualifiedName: string): DOM.Attr {
+    qualifiedName = normalizeAttributeName(qualifiedName);
     const index = this.findIndex((item) => item.name === qualifiedName);
     if (index === -1) {
       throw new DOMException("Node was not found");
@@ -59,4 +59,10 @@ declare global {
   interface DOM {
     NamedNodeMap: typeof NamedNodeMapClass;
   }
+}
+
+function normalizeAttributeName(name: string): string {
+  name = name.toLowerCase();
+  name = svgAttributesAliases.get(name) ?? name;
+  return name;
 }

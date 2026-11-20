@@ -422,12 +422,7 @@ export function getOuterOrInnerHtml(parentElement: DOM.Element, asOuterHtml: boo
             }
 
             default: {
-              // escaping: https://html.spec.whatwg.org/multipage/parsing.html#escapingString
-              innerHTML += (child as DOM.Text).data
-                .replace(/&/g, "&amp;")
-                .replace(/\xA0/g, "&nbsp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;");
+              innerHTML += escapeString((child as DOM.Text).data);
               break;
             }
           }
@@ -450,24 +445,28 @@ export function getOuterOrInnerHtml(parentElement: DOM.Element, asOuterHtml: boo
 }
 
 function getOuterHTMLOpeningTag(parentElement: DOM.Element) {
-  return "<" + parentElement.localName + getElementAttributesString(parentElement) + ">";
+  return `<${parentElement.localName}${getElementAttributesString(parentElement)}>`;
 }
 
 export function getElementAttributesString(element: DOM.Element): string {
   let out = "";
 
   for (const attribute of element.attributes) {
-    // attribute names should already all be lower-case
-    out += ` ${attribute.name}`;
-
-    // escaping: https://html.spec.whatwg.org/multipage/parsing.html#escapingString
-    out += `="${attribute.value
-      .replace(/&/g, "&amp;")
-      .replace(/\xA0/g, "&nbsp;")
-      .replace(/"/g, "&quot;")}"`;
+    out += ` ${attribute.name}="${escapeString(attribute.value)}"`;
   }
 
   return out;
+}
+
+// escaping: https://html.spec.whatwg.org/multipage/parsing.html#escapingString
+const NBSP_REGEX = /\xA0/g;
+function escapeString(string: string): string {
+  return string
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll(NBSP_REGEX, "&nbsp;")
+    .replaceAll('"', "&quot;");
 }
 
 export function getElementsByTagNameWildcard(
