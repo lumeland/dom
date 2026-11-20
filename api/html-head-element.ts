@@ -1,4 +1,8 @@
-class HTMLHeadElementClass extends dom.HTMLElement {}
+class HTMLHeadElementClass extends dom.HTMLElement {
+  constructor(attributes: [string, string][]) {
+    super("HEAD", attributes);
+  }
+}
 
 globalThis.dom.HTMLHeadElement = HTMLHeadElementClass;
 

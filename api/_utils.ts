@@ -1,36 +1,20 @@
-export { parse, parseFrag } from "../api/parser.ts";
-import { DOM as DOMSelector } from "../api/dom/selectors/nwsapi-types.ts";
+import * as wasm from "../wasm/dom_wasm.js";
+import * as CSSSelect from "css-select";
 
 export const $createClone = Symbol.for("createClone");
 export const $parentNode = Symbol.for("parentNode");
 export const $ownerDocument = Symbol.for("ownerDocument");
 export const $ownerElement = Symbol.for("ownerElement");
 export const $classList = Symbol.for("classList");
-export const $selectorAPI = Symbol.for("selectorAPI");
 export const $onChange = Symbol.for("onChange");
 export const $className = Symbol.for("className");
 
-export type Selector = (doc: DOM.Document) => {
-  first(
-    selector: string,
-    context: DOM.Element | DOM.Document | DOM.DocumentFragment,
-    callback?: (element: DOM.Element) => void,
-  ): DOM.Element | null;
-  match(
-    selector: string,
-    context: DOM.Element | DOM.Document | DOM.DocumentFragment,
-    callback?: (element: DOM.Element) => void,
-  ): boolean;
-  select(
-    selector: string,
-    context: DOM.Element | DOM.Document | DOM.DocumentFragment,
-    callback?: (element: DOM.Element) => void,
-  ): DOM.Element[];
-};
-export type SelectorAPI = ReturnType<Selector>;
+export function parse(html: string): string {
+  return wasm.parse(html);
+}
 
-export function createSelector(doc: DOM.Document): SelectorAPI {
-  return DOMSelector(doc);
+export function parseFrag(html: string, contextLocalName?: string): string {
+  return wasm.parse_frag(html, contextLocalName ?? "");
 }
 
 export function flatNodes(nodes: (DOM.Node | string)[]): DOM.Node[] {
@@ -42,11 +26,72 @@ export function flatNodes(nodes: (DOM.Node | string)[]): DOM.Node[] {
     }
     if (node instanceof dom.DocumentFragment) {
       flat.push(...node.childNodes);
+      node.childNodes.splice(0, node.childNodes.length);
       continue;
     }
     flat.push(node);
   }
   return flat;
+}
+
+const adapter = {
+  isTag(node: DOM.Element): node is DOM.Element {
+    return node.nodeType === dom.NodeType.ELEMENT_NODE;
+  },
+  getAttributeValue(element: DOM.Element, name: string) {
+    return element.getAttribute(name) ?? undefined;
+  },
+  getChildren(node: DOM.Element): DOM.Element[] {
+    return node.childNodes as DOM.NodeList<DOM.Element>;
+  },
+  getName(element: DOM.Element): string {
+    return element.localName;
+  },
+  getParent(element: DOM.Element): DOM.Element | null {
+    return element.parentNode as DOM.Element | null;
+  },
+  getSiblings(element: DOM.Element): DOM.Element[] {
+    return (element.parentNode?.childNodes as DOM.NodeList<DOM.Element> | undefined) ?? [];
+  },
+  getText(node: DOM.Element): string {
+    return node.textContent ?? "";
+  },
+  hasAttrib(element: DOM.Element, name: string): boolean {
+    return element.hasAttribute(name);
+  },
+  removeSubsets(nodes: DOM.Element[]): DOM.Element[] {
+    return nodes;
+  },
+};
+
+export function selectOne<E>(query: string, element: DOM.Element): E | null {
+  try {
+    return CSSSelect.selectOne(query, element, { adapter }) as E;
+  } catch (cause) {
+    const error = new DOMException(`'${query}' is not a valid selector`);
+    error.cause = cause;
+    throw error;
+  }
+}
+
+export function selectAll<E>(query: string, element: DOM.Element): E[] {
+  try {
+    return CSSSelect.selectAll(query, element, { adapter }) as E[];
+  } catch (cause) {
+    const error = new DOMException(`'${query}' is not a valid selector`);
+    error.cause = cause;
+    throw error;
+  }
+}
+
+export function matches(query: string, element: DOM.Element) {
+  try {
+    return CSSSelect.is(element, query, { adapter });
+  } catch (cause) {
+    const error = new DOMException(`'${query}' is not a valid selector`);
+    error.cause = cause;
+    throw error;
+  }
 }
 
 const voidElements = new Set([
@@ -99,10 +144,14 @@ function isTemplateElement(data: Data): data is HTMLTemplateElementData {
   return data[0] === dom.NodeType.ELEMENT_NODE && data[1].toLowerCase() === "template";
 }
 
-// export function fragmentNodesFromString(html: string, contextLocalName: string): DOM.Node {
-//   const parsed = JSON.parse(parseFrag(html, contextLocalName));
-//   return nodesFromArray(parsed);
-// }
+function createHTMLElement(nodeName: string, attributes: [string, string][]): DOM.HTMLElement {
+  switch (nodeName) {
+    case "head":
+      return new dom.HTMLHeadElement(attributes);
+    default:
+      return new dom.HTMLElement(nodeName, attributes);
+  }
+}
 
 export function nodesFromArray(
   data: DocumentOrElementData | HTMLTemplateElementData,
@@ -126,8 +175,7 @@ export function nodesFromArray(
     return element;
   }
 
-  const ElementConstructor = dom.elements.get(nodeName) ?? dom.HTMLElement;
-  const element = new ElementConstructor(nodeName, attributes);
+  const element = createHTMLElement(nodeName, attributes);
   element[$ownerDocument] = ownerDocument;
   const childNodes = element.childNodes;
 
@@ -360,7 +408,12 @@ export function isElement(node: DOM.Node): node is DOM.Element {
 }
 
 const DATASET_REGEX = /([A-Z])/g;
-export function toDataAttrName(name: string): `data-${string}` {
+const VALID_NAME =
+  /^(?:[A-Za-z][^\0\t\n\f\r\u0020/>]*|[:_\u0080-\u{10FFFF}][A-Za-z0-9-.:_\u0080-\u{10FFFF}]*)$/u;
+export function toDataAttrName(name: string, check = false): `data-${string}` {
+  if (check && !VALID_NAME.test(name)) {
+    throw new DOMException(`An invalid or illegal data attribute name was specified`);
+  }
   return `data-${name.replaceAll(DATASET_REGEX, "-$1").toLowerCase()}`;
 }
 

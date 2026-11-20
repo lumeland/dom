@@ -44,16 +44,16 @@ class CharacterDataClass extends dom.Node {
   }
 
   deleteData(offset: number, count: number): void {
-    throw new Error("to-do");
+    this.data = this.data.slice(offset, offset + count);
   }
   insertData(offset: number, data: string): void {
-    throw new Error("to-do");
+    this.data = `${this.data.slice(0, offset)}${data}${this.data.slice(offset)}`;
   }
   replaceData(offset: number, count: number, data: string): void {
-    throw new Error("to-do");
+    this.data = `${this.data.slice(0, offset)}${data}${this.data.slice(offset + count)}`;
   }
   substringData(offset: number, count: number): string {
-    throw new Error("to-do");
+    return this.data.slice(offset, offset + count);
   }
   after(...nodes: (DOM.Node | string)[]): void {
     const parentNode = this.parentNode;

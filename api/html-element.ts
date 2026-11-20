@@ -112,7 +112,7 @@ class HTMLElementClass extends dom.Element {
         },
 
         set: (_target, property, value) => {
-          const name = toDataAttrName(String(property));
+          const name = toDataAttrName(String(property), true);
           this.setAttribute(name, String(value));
           return true;
         },

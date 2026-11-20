@@ -1,5 +1,5 @@
-import { dom } from "./dom-ts/dom.ts";
-import { nodesFromArray, parse } from "./dom-ts/_utils.ts";
+import { dom } from "./api/dom.ts";
+import { nodesFromArray, parse } from "./api/_utils.ts";
 
 export { dom };
 

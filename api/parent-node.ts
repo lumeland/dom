@@ -1,9 +1,7 @@
-import { checkAncestor, flatNodes, type SelectorAPI, $selectorAPI, $parentNode } from "./_utils.ts";
+import { checkAncestor, flatNodes, selectAll, selectOne, $parentNode } from "./_utils.ts";
 
 abstract class ParentNodeClass extends dom.Node {
   #children: DOM.HTMLCollection | null = null;
-
-  abstract get [$selectorAPI](): SelectorAPI;
 
   get childElementCount(): number {
     return this.children.length;
@@ -36,7 +34,7 @@ abstract class ParentNodeClass extends dom.Node {
     this.childNodes.push(...allNodes);
   }
   moveBefore(node: DOM.Node, child: DOM.Node | null): void {
-    throw new Error("to-do");
+    this.insertBefore(node, child);
   }
   prepend(...nodes: (DOM.Node | string)[]): void {
     const allNodes = flatNodes(nodes);
@@ -52,14 +50,14 @@ abstract class ParentNodeClass extends dom.Node {
     this.childNodes.unshift(...allNodes);
   }
   querySelector<E extends DOM.Element = DOM.HTMLElement>(selectors: string): E | null {
-    return this[$selectorAPI].first(selectors, this as unknown as DOM.Element) as E;
+    return selectOne<E>(selectors, this as unknown as DOM.Element);
   }
   querySelectorAll<E extends DOM.Element = DOM.HTMLElement>(selectors: string): DOM.NodeList<E> {
-    const result = this[$selectorAPI].select(selectors, this as unknown as DOM.Element);
-    return new dom.NodeList(...result) as DOM.NodeList<E>;
+    return new dom.NodeList(...selectAll<E>(selectors, this as unknown as DOM.Element));
   }
   replaceChildren(...nodes: (DOM.Node | string)[]): void {
-    throw new Error("to-do");
+    this.childNodes.splice(0, this.childNodes.length);
+    this.append(...nodes);
   }
 }
 

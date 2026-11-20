@@ -1,4 +1,4 @@
-import { checkAncestor, $createClone, $ownerDocument, $parentNode } from "./_utils.ts";
+import { checkAncestor, $createClone, $ownerDocument, $parentNode, flatNodes } from "./_utils.ts";
 
 const NodeTypes = {
   ELEMENT_NODE: 1,
@@ -341,19 +341,19 @@ class NodeClass extends EventTarget {
     // intended logic
     return Node.DOCUMENT_POSITION_FOLLOWING;
   }
-  getRootNode(options?: GetRootNodeOptions): DOM.Node {
-    throw new Error("to-do");
+  getRootNode(_options?: GetRootNodeOptions): DOM.Node {
+    return this.ownerDocument ?? this.parentElement?.getRootNode() ?? this;
   }
-  isDefaultNamespace(namespace: string | null): boolean {
+  isDefaultNamespace(_namespace: string | null): boolean {
     throw new Error("to-do");
   }
   isEqualNode(otherNode: DOM.Node | null): boolean {
     return this === otherNode;
   }
-  lookupNamespaceURI(prefix: string | null): string | null {
+  lookupNamespaceURI(_prefix: string | null): string | null {
     throw new Error("to-do");
   }
-  lookupPrefix(namespace: string | null): string | null {
+  lookupPrefix(_namespace: string | null): string | null {
     throw new Error("to-do");
   }
   normalize(): void {
@@ -415,9 +415,13 @@ class NodeClass extends EventTarget {
       );
     }
 
-    childNodes?.splice(index, 1, node);
+    const nodes = flatNodes([node]);
+    for (const node of nodes) {
+      node.#parentNode = this;
+    }
+
+    childNodes?.splice(index, 1, ...nodes);
     child.#parentNode = null;
-    node.#parentNode = this;
     return child;
   }
 }

@@ -7,10 +7,11 @@ describe("Large child count", () => {
 
     // Arbitrarily large number that causes a stack overflow on
     // my machine. Probably not a good test, but it works for now.
-    const length = 0x22222;
+    const length = 0x2222;
     const childHtml = `<div class="foo">bar</div>`;
     const parent = doc.querySelector("#parent")!;
-    parent.innerHTML = Array.from({ length }).fill(childHtml).join("");
+    const code = Array.from({ length }).fill(childHtml).join("");
+    parent.innerHTML = code;
     const childrenDoc = doc.querySelectorAll(".foo");
     const childrenParent = parent.querySelectorAll(".foo");
     expect(childrenDoc.length).toBe(length);

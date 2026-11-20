@@ -1,6 +1,6 @@
 import { Bench } from "tinybench";
 import { DOMParser } from "../mod.ts";
-import { DOMParser as OldDomParser } from "@lumeland/dom";
+import { DOMParser as DenoDOM } from "@lumeland/dom";
 import { parse } from "parse5";
 import { JSDOM } from "jsdom";
 import { readFileSync } from "node:fs";
@@ -9,14 +9,14 @@ import { fileURLToPath } from "node:url";
 const bench = new Bench();
 const code = readFileSync(fileURLToPath(import.meta.resolve("./code.html")), "utf-8");
 const parser = new DOMParser();
-const oldParser = new OldDomParser();
+const denoDOM = new DenoDOM();
 
-bench.add("New @lumeland/dom", () => {
+bench.add("@lumeland/dom", () => {
   parser.parseFromString(code, "text/html");
 });
 
-bench.add("Old @lumeland/dom", () => {
-  oldParser.parseFromString(code, "text/html");
+bench.add("@b-fuze/deno-dom", () => {
+  denoDOM.parseFromString(code, "text/html");
 });
 
 bench.add("parse5", () => {

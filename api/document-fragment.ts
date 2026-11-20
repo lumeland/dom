@@ -1,4 +1,4 @@
-import { $createClone, type SelectorAPI, $selectorAPI, getElementById } from "./_utils.ts";
+import { $createClone, getElementById } from "./_utils.ts";
 
 class DocumentFragmentClass extends dom.ParentNode {
   constructor() {
@@ -10,16 +10,6 @@ class DocumentFragmentClass extends dom.ParentNode {
   }
   get nodeValue() {
     return null;
-  }
-
-  get [$selectorAPI](): SelectorAPI {
-    const api = this.ownerDocument?.[$selectorAPI];
-
-    if (!api) {
-      throw new Error("This node must have an owner document to use the Selector API");
-    }
-
-    return api;
   }
 
   [$createClone](): DOM.DocumentFragment {

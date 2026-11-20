@@ -1,18 +1,13 @@
 import {
   $createClone,
-  createSelector,
   getElementById,
   getElementsByClassName,
   getElementsByTagName,
   getElementsByTagNameWildcard,
-  $selectorAPI,
   $ownerDocument,
-  type SelectorAPI,
 } from "./_utils.ts";
 
 export class DocumentClass extends dom.ParentNode {
-  #selector: SelectorAPI | null = null;
-
   static fillNodes(document: DOM.HTMLDocument, node: DOM.Node) {
     for (const child of Array.from(node.childNodes)) {
       document.appendChild(child);
@@ -34,6 +29,7 @@ export class DocumentClass extends dom.ParentNode {
   }
 
   #doctype: DOM.DocumentType | null = null;
+  #implementation: DOM.DOMImplementation | null = null;
 
   vlinkColor: string = "";
   alinkColor: string = "";
@@ -47,11 +43,6 @@ export class DocumentClass extends dom.ParentNode {
 
   constructor() {
     super("#document", dom.NodeType.DOCUMENT_NODE);
-    //this.implementation = new DOMImplementation();
-  }
-
-  get [$selectorAPI](): SelectorAPI {
-    return this.#selector ?? (this.#selector = createSelector(this));
   }
 
   set nodeValue(_value: string | null) {
@@ -83,7 +74,7 @@ export class DocumentClass extends dom.ParentNode {
   get all(): HTMLAllCollection {
     throw new Error("to-do");
   }
-  get anchors(): HTMLCollectionOf<HTMLAnchorElement> {
+  get anchors(): DOM.HTMLCollection<HTMLAnchorElement> {
     throw new Error("to-do");
   }
   get applets(): DOM.HTMLCollection {
@@ -115,10 +106,10 @@ export class DocumentClass extends dom.ParentNode {
   get documentURI(): string {
     throw new Error("to-do");
   }
-  get embeds(): HTMLCollectionOf<HTMLEmbedElement> {
+  get embeds(): DOM.HTMLCollection<HTMLEmbedElement> {
     throw new Error("to-do");
   }
-  get forms(): HTMLCollectionOf<HTMLFormElement> {
+  get forms(): DOM.HTMLCollection<HTMLFormElement> {
     throw new Error("to-do");
   }
   get head(): DOM.HTMLHeadElement | null {
@@ -141,11 +132,11 @@ export class DocumentClass extends dom.ParentNode {
   get hidden(): boolean {
     throw new Error("to-do");
   }
-  get images(): DOM.HTMLCollectionOf<HTMLImageElement> {
+  get images(): DOM.HTMLCollection<HTMLImageElement> {
     throw new Error("to-do");
   }
-  get implementation(): DOMImplementation {
-    throw new Error("to-do");
+  get implementation(): DOM.DOMImplementation {
+    return this.#implementation || (this.#implementation = new dom.DOMImplementation());
   }
   get inputEncoding(): string {
     throw new Error("to-do");
@@ -153,7 +144,7 @@ export class DocumentClass extends dom.ParentNode {
   get lastModified(): string {
     throw new Error("to-do");
   }
-  get links(): DOM.HTMLCollectionOf<HTMLAnchorElement | HTMLAreaElement> {
+  get links(): DOM.HTMLCollection<HTMLAnchorElement | HTMLAreaElement> {
     throw new Error("to-do");
   }
   get location(): Location {
@@ -165,22 +156,22 @@ export class DocumentClass extends dom.ParentNode {
   get pictureInPictureEnabled(): boolean {
     throw new Error("to-do");
   }
-  get plugins(): DOM.HTMLCollectionOf<HTMLEmbedElement> {
+  get plugins(): DOM.HTMLCollection<HTMLEmbedElement> {
     throw new Error("to-do");
   }
   get rootElement(): SVGSVGElement | null {
     throw new Error("to-do");
   }
-  get scripts(): HTMLCollectionOf<HTMLScriptElement> {
+  get scripts(): DOM.HTMLCollection<HTMLScriptElement> {
     throw new Error("to-do");
   }
-  createAttribute(localName: string): DOM.Attr {
+  createAttribute(_localName: string): DOM.Attr {
     throw new Error("to-do");
   }
-  createAttributeNS(namespace: string | null, qualifiedName: string): DOM.Attr {
+  createAttributeNS(_namespace: string | null, _qualifiedName: string): DOM.Attr {
     throw new Error("to-do");
   }
-  createCDATASection(data: string): CDATASection {
+  createCDATASection(_data: string): CDATASection {
     throw new Error("to-do");
   }
   createComment(data: string): DOM.Comment {
@@ -217,9 +208,9 @@ export class DocumentClass extends dom.ParentNode {
     }
   }
   createElementNS(
-    namespace: string | null,
-    qualifiedName: string,
-    options?: string | ElementCreationOptions,
+    _namespace: string | null,
+    _qualifiedName: string,
+    _options?: string | ElementCreationOptions,
   ): DOM.Element {
     throw new Error("to-do");
   }
@@ -231,17 +222,17 @@ export class DocumentClass extends dom.ParentNode {
   getElementById(elementId: string): DOM.HTMLElement | null {
     return getElementById(this.childNodes, elementId);
   }
-  getElementsByClassName(classNames: string): DOM.HTMLCollectionOf<DOM.Element> {
+  getElementsByClassName(classNames: string): DOM.HTMLCollection<DOM.Element> {
     return getElementsByClassName(
       this.childNodes,
       classNames.trim().split(/\s+/),
       new dom.HTMLCollection(),
     );
   }
-  getElementsByName(elementName: string): DOM.NodeList<DOM.HTMLElement> {
+  getElementsByName(_elementName: string): DOM.NodeList<DOM.HTMLElement> {
     throw new Error("to-do");
   }
-  getElementsByTagName(qualifiedName: string): DOM.HTMLCollectionOf<DOM.Element> {
+  getElementsByTagName(qualifiedName: string): DOM.HTMLCollection<DOM.Element> {
     if (qualifiedName === "*") {
       return getElementsByTagNameWildcard(this.childNodes, new dom.HTMLCollection());
     }
@@ -253,9 +244,9 @@ export class DocumentClass extends dom.ParentNode {
     );
   }
   getElementsByTagNameNS(
-    namespace: string | null,
-    localName: string,
-  ): DOM.HTMLCollectionOf<DOM.Element> {
+    _namespace: string | null,
+    _localName: string,
+  ): DOM.HTMLCollection<DOM.Element> {
     throw new Error("to-do");
   }
   get textContent(): null {

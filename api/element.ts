@@ -9,12 +9,11 @@ import {
   nodesFromArray,
   $ownerElement,
   parseFrag,
-  $selectorAPI,
   $parentNode,
-  type SelectorAPI,
   $onChange,
   $className,
   reactive,
+  matches,
 } from "./_utils.ts";
 
 class ElementClass extends dom.ParentNode {
@@ -63,16 +62,6 @@ class ElementClass extends dom.ParentNode {
 
   [$createClone](): DOM.Element {
     return new dom.Element(this.tagName, []);
-  }
-
-  get [$selectorAPI](): SelectorAPI {
-    const api = this.ownerDocument?.[$selectorAPI];
-
-    if (!api) {
-      throw new Error("This node must have an owner document to use the Selector API");
-    }
-
-    return api;
   }
 
   cloneNode(subtree?: boolean): DOM.Element {
@@ -223,7 +212,7 @@ class ElementClass extends dom.ParentNode {
   getAttribute(qualifiedName: string): string | null {
     return this.#attributes?.getNamedItem(qualifiedName)?.value ?? null;
   }
-  getAttributeNS(namespace: string | null, localName: string): string | null {
+  getAttributeNS(_namespace: string | null, _localName: string): string | null {
     throw new Error("to-do");
   }
   getAttributeNames(): string[] {
@@ -233,17 +222,17 @@ class ElementClass extends dom.ParentNode {
   getAttributeNode(qualifiedName: string): DOM.Attr | null {
     return this.#attributes?.getNamedItem(qualifiedName) ?? null;
   }
-  getAttributeNodeNS(namespace: string | null, localName: string): Attr | null {
+  getAttributeNodeNS(_namespace: string | null, _localName: string): Attr | null {
     throw new Error("to-do");
   }
-  getElementsByClassName(classNames: string): DOM.HTMLCollectionOf<DOM.Element> {
+  getElementsByClassName(classNames: string): DOM.HTMLCollection<DOM.Element> {
     return getElementsByClassName(
       this.childNodes,
       classNames.trim().split(/\s+/),
       new dom.HTMLCollection(),
     );
   }
-  getElementsByTagName(qualifiedName: string): DOM.HTMLCollectionOf<DOM.Element> {
+  getElementsByTagName(qualifiedName: string): DOM.HTMLCollection<DOM.Element> {
     if (qualifiedName === "*") {
       return getElementsByTagNameWildcard(this.childNodes, new dom.HTMLCollection());
     }
@@ -255,45 +244,51 @@ class ElementClass extends dom.ParentNode {
     );
   }
   getElementsByTagNameNS(
-    namespace: string | null,
-    localName: string,
-  ): DOM.HTMLCollectionOf<DOM.Element> {
+    _namespace: string | null,
+    _localName: string,
+  ): DOM.HTMLCollection<DOM.Element> {
     throw new Error("to-do");
   }
-  getHTML(options?: GetHTMLOptions): string {
+  getHTML(_options?: GetHTMLOptions): string {
     throw new Error("to-do");
   }
   hasAttribute(qualifiedName: string): boolean {
     return !!this.#attributes?.getNamedItem(qualifiedName);
   }
-  hasAttributeNS(namespace: string | null, localName: string): boolean {
+  hasAttributeNS(_namespace: string | null, _localName: string): boolean {
     throw new Error("to-do");
   }
   hasAttributes(): boolean {
     throw new Error("to-do");
   }
-  insertAdjacentElement(where: InsertPosition, element: DOM.Element): DOM.Element | null {
+  insertAdjacentElement(_where: InsertPosition, _element: DOM.Element): DOM.Element | null {
     throw new Error("to-do");
   }
-  insertAdjacentHTML(position: InsertPosition, string: string): void {
+  insertAdjacentHTML(_position: InsertPosition, _string: string): void {
     throw new Error("to-do");
   }
-  insertAdjacentText(where: InsertPosition, data: string): void {
+  insertAdjacentText(_where: InsertPosition, _data: string): void {
     throw new Error("to-do");
   }
   matches(selectors: string): boolean {
-    return this[$selectorAPI].match(selectors, this);
+    return matches(selectors, this);
   }
   removeAttribute(qualifiedName: string): void {
     if (this.hasAttribute(qualifiedName)) {
       this.attributes.removeNamedItem(qualifiedName);
     }
   }
-  removeAttributeNS(namespace: string | null, localName: string): void {
+  removeAttributeNS(_namespace: string | null, _localName: string): void {
     throw new Error("to-do");
   }
-  removeAttributeNode(attr: Attr): Attr {
-    throw new Error("to-do");
+  removeAttributeNode(attr: DOM.Attr): DOM.Attr {
+    const key = this.attributes.indexOf(attr);
+    if (key === -1) {
+      throw new DOMException("The attribute to remove is not found");
+    }
+    this.attributes.splice(key, 1);
+    attr[$ownerElement] = null;
+    return attr;
   }
   setAttribute(qualifiedName: string, value: string): void {
     const existing = this.attributes.getNamedItem(qualifiedName);
@@ -307,19 +302,19 @@ class ElementClass extends dom.ParentNode {
     attr.value = String(value);
     this.attributes.push(attr);
   }
-  setAttributeNS(namespace: string | null, qualifiedName: string, value: string): void {
+  setAttributeNS(_namespace: string | null, _qualifiedName: string, _value: string): void {
     throw new Error("to-do");
   }
   setAttributeNode(attr: DOM.Attr): DOM.Attr | null {
     return this.attributes.setNamedItem(attr);
   }
-  setAttributeNodeNS(attr: Attr): Attr | null {
+  setAttributeNodeNS(_attr: Attr): Attr | null {
     throw new Error("to-do");
   }
-  setHTMLUnsafe(html: string): void {
+  setHTMLUnsafe(_html: string): void {
     throw new Error("to-do");
   }
-  setPointerCapture(pointerId: number): void {
+  setPointerCapture(_pointerId: number): void {
     throw new Error("to-do");
   }
   toggleAttribute(qualifiedName: string, force?: boolean): boolean {

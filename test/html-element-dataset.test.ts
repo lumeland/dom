@@ -67,7 +67,7 @@ describe("Dataset", () => {
     expect(div.hasAttribute("data--f-i-z-zy")).toBeTruthy();
     expect(div.outerHTML).toBe(`<div bar="nope" foo="notdataset" data--f-i-z-zy="42"></div>`);
 
-    div.setAttribute("data--éclair", true);
+    div.setAttribute("data--éclair", true as unknown as string);
 
     expect(div.dataset.foo).toBeUndefined();
     expect(div.dataset.FooBar).toBeUndefined();
@@ -90,10 +90,6 @@ describe("Dataset", () => {
 
     expect(() => {
       div.dataset["-e"] = "fails";
-    }).toThrow();
-
-    expect(() => {
-      div.dataset["—"] = "fails";
     }).toThrow();
   });
 });

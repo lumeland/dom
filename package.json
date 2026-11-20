@@ -6,18 +6,22 @@
   },
   "type": "module",
   "scripts": {
-    "test": "vitest run",
+    "test": "vitest run --no-isolate",
     "fmt": "oxfmt .",
     "build:wasm": "wasm-pack build --target bundler --out-dir=wasm --no-pack",
     "bench": "pnpm bench:internal && pnpm bench:compare",
-    "bench:internal": "node --no-warnings=ExperimentalWarning bench/dom.ts",
+    "bench:internal": "node --no-warnings=ExperimentalWarning bench/internal.ts",
     "bench:compare": "node --no-warnings=ExperimentalWarning bench/compare.ts",
     "lint": "oxlint . --fix"
+  },
+  "dependencies": {
+    "css-select": "^7.0.0"
   },
   "devDependencies": {
     "@lumeland/dom": "^0.1.56",
     "@types/jsdom": "^30.0.0",
     "@types/node": "^26.6.6",
+    "@types/nwsapi": "^2.2.7",
     "jsdom": "^31.0.0",
     "oxfmt": "^0.77.0",
     "oxlint": "^1.92.0",

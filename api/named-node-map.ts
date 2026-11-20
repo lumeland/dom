@@ -17,7 +17,7 @@ class NamedNodeMapClass extends ArrayLike<DOM.Attr> {
     qualifiedName = qualifiedName.toLowerCase();
     return this.find((item) => item.name === qualifiedName) ?? null;
   }
-  getNamedItemNS(namespace: string | null, localName: string): DOM.Attr | null {
+  getNamedItemNS(_namespace: string | null, _localName: string): DOM.Attr | null {
     throw new Error("to-do");
   }
   item(index: number): DOM.Attr | null {
@@ -32,7 +32,7 @@ class NamedNodeMapClass extends ArrayLike<DOM.Attr> {
     item[$ownerElement] = null;
     return item;
   }
-  removeNamedItemNS(namespace: string | null, localName: string): DOM.Attr {
+  removeNamedItemNS(_namespace: string | null, _localName: string): DOM.Attr {
     throw new Error("to-do");
   }
   setNamedItem(attr: DOM.Attr): DOM.Attr | null {
@@ -44,7 +44,7 @@ class NamedNodeMapClass extends ArrayLike<DOM.Attr> {
     this.push(attr);
     return existing ?? null;
   }
-  setNamedItemNS(attr: DOM.Attr): DOM.Attr | null {
+  setNamedItemNS(_attr: DOM.Attr): DOM.Attr | null {
     throw new Error("to-do");
   }
 }

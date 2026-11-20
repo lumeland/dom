@@ -1,18 +1,18 @@
 import { describe, it } from "vitest";
-import { Document, Element, HTMLDocument, NodeList } from "../mod.ts";
+import "../mod.ts";
 
 // oxlint-disable no-unused-expressions
 describe("Nodelist", () => {
   it("Using the public API types for NodeList works", () => {
     interface Queryable {
-      querySelector(selectors: string): Element | null;
-      querySelectorAll(selectors: string): NodeList;
+      querySelector(selectors: string): DOM.Element | null;
+      querySelectorAll(selectors: string): DOM.NodeList;
     }
 
     // Note this test is a type assertion, so there are no actual assertions.
     // Type assertions
-    (d: HTMLDocument): Queryable => d;
-    (e: Document): Queryable => e;
-    (e: Element): Queryable => e;
+    (d: DOM.HTMLDocument): Queryable => d;
+    (e: DOM.Document): Queryable => e;
+    (e: DOM.Element): Queryable => e;
   });
 });

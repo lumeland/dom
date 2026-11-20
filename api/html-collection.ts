@@ -1,17 +1,17 @@
 import { $onChange } from "./_utils.ts";
 
-class HTMLCollectionClass extends Array<DOM.Element> {
+class HTMLCollectionClass<T extends DOM.Element = DOM.Element> extends Array<T> {
   static createFromNodeList(nodes: DOM.NodeList): DOM.HTMLCollection {
     const collection = new dom.HTMLCollection(...nodes.filter(isElement));
     nodes[$onChange] = () => collection.splice(0, collection.length, ...nodes.filter(isElement));
     return collection;
   }
 
-  item(index: number): DOM.Element | null {
+  item(index: number): T | null {
     return this[index] ?? null;
   }
 
-  namedItem(name: string): DOM.Element | null {
+  namedItem(_name: string): T | null {
     throw new Error("to-do");
   }
 
@@ -24,26 +24,13 @@ function isElement(node: DOM.Node): node is DOM.Element {
   return node.nodeType === dom.NodeType.ELEMENT_NODE;
 }
 
-class HTMLCollectionOfClass<T extends DOM.Element> extends Array<T> {
-  item(index: number): T | null {
-    return this[index] ?? null;
-  }
-
-  namedItem(name: string): T | null {
-    throw new Error("to-do");
-  }
-}
-
 globalThis.dom.HTMLCollection = HTMLCollectionClass;
-globalThis.dom.HTMLCollectionOf = HTMLCollectionOfClass;
 
 declare global {
   namespace DOM {
-    type HTMLCollection = HTMLCollectionClass;
-    type HTMLCollectionOf<T extends DOM.Element> = HTMLCollectionOfClass<T>;
+    type HTMLCollection<T extends DOM.Element = DOM.Element> = HTMLCollectionClass<T>;
   }
   interface DOM {
     HTMLCollection: typeof HTMLCollectionClass;
-    HTMLCollectionOf: typeof HTMLCollectionOfClass;
   }
 }

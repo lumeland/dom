@@ -13,7 +13,7 @@ export class TextClass extends dom.CharacterData {
     throw new Error("to-do");
   }
 
-  splitText(offset: number): DOM.Text {
+  splitText(_offset: number): DOM.Text {
     throw new Error("to-do");
   }
 }
