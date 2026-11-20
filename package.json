@@ -5,6 +5,11 @@
   "author": {
     "name": "Óscar Otero"
   },
+  "files": [
+    "api",
+    "wasm",
+    "mod.ts"
+  ],
   "type": "module",
   "exports": {
     ".": "./mod.ts"
@@ -12,10 +17,11 @@
   "scripts": {
     "test": "vitest run --no-isolate",
     "fmt": "oxfmt .",
-    "build:wasm": "wasm-pack build --target bundler --out-dir=wasm --no-pack",
+    "build": "rm -rf package && pnpm build:wasm && tsc -p . && cp -r wasm build && pnpm pack --out=package.tgz && rm -rf build && tar -xzf package.tgz && rm package.tgz && node build.js && oxfmt package/*",
+    "build:wasm": "wasm-pack build --target web --out-dir=wasm --no-pack",
     "bench": "pnpm bench:internal && pnpm bench:compare",
-    "bench:internal": "node --no-warnings=ExperimentalWarning bench/internal.ts",
-    "bench:compare": "node --no-warnings=ExperimentalWarning bench/compare.ts",
+    "bench:internal": "node bench/internal.ts",
+    "bench:compare": "node bench/compare.ts",
     "lint": "oxlint . --fix"
   },
   "dependencies": {
@@ -32,6 +38,7 @@
     "oxlint-tsgolint": "^7.0.2006",
     "parse5": "^8.1.1",
     "tinybench": "^6.2.3",
+    "typescript": "^7.0.2",
     "vitest": "^5.1.0"
   },
   "devEngines": {

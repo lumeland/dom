@@ -26,17 +26,17 @@ class DOMImplementationClass {
   createHTMLDocument(title?: string): DOM.Document {
     const doc = this.createDocument(null, null);
 
-    const html = new dom.HTMLElement("html", []);
+    const html = new dom.HTMLElement("html");
     html[$ownerDocument] = doc;
     doc.appendChild(html);
 
-    const head = new dom.HTMLHeadElement([]);
-    const titleEl = new dom.Element("title", []);
+    const head = new dom.HTMLHeadElement();
+    const titleEl = new dom.Element("title");
     titleEl.appendChild(new dom.Text(title ?? ""));
     head.appendChild(titleEl);
     html.appendChild(head);
 
-    const body = new dom.Element("body", []);
+    const body = new dom.Element("body");
     body.append(head, body);
     return doc;
   }

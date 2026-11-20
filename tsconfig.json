@@ -4,16 +4,13 @@
     "moduleResolution": "NodeNext",
     "module": "NodeNext",
     "allowImportingTsExtensions": true,
+    "target": "ES2022",
+    "lib": ["ES2022", "ESNext.Iterator", "DOM", "DOM.Iterable", "ESNext.Temporal"],
     "rewriteRelativeImportExtensions": true,
-    "target": "ES2025",
-    "erasableSyntaxOnly": true,
-    "lib": [
-      "ES2025",
-      "ESNext.Iterator",
-      "DOM",
-      "DOM.Iterable",
-      "DOM.AsyncIterable",
-      "ESNext.Temporal"
-    ]
-  }
+    "skipLibCheck": true,
+    "outDir": "build",
+    "rootDir": ".",
+    "declaration": true
+  },
+  "exclude": ["build", "bench", "src", "test", "wasm"]
 }

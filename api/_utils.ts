@@ -1,4 +1,6 @@
+import { readFileSync } from "node:fs";
 import * as wasm from "../wasm/dom_wasm.js";
+
 import * as CSSSelect from "css-select";
 
 export const $createClone = Symbol.for("createClone");
@@ -8,6 +10,10 @@ export const $ownerElement = Symbol.for("ownerElement");
 export const $classList = Symbol.for("classList");
 export const $onChange = Symbol.for("onChange");
 export const $className = Symbol.for("className");
+
+wasm.initSync({
+  module: readFileSync(new URL(import.meta.resolve("../wasm/dom_wasm_bg.wasm"))),
+});
 
 export function parse(html: string): string {
   return wasm.parse(html);
