@@ -57,7 +57,7 @@ class HTMLTemplateElementClass extends dom.HTMLElement {
     }
 
     const parsed = JSON.parse(parseFrag(value, this.localName));
-    const nodes = Array.from(nodesFromArray(parsed, this.ownerDocument).childNodes[0].childNodes);
+    const nodes = nodesFromArray(parsed, this.ownerDocument).childNodes[0].childNodes;
 
     for (const child of nodes) {
       child[$parentNode] = this;

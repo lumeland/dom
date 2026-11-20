@@ -45,6 +45,10 @@ export class DocumentClass extends dom.ParentNode {
     super("#document", dom.NodeType.DOCUMENT_NODE);
   }
 
+  cloneNode(subtree?: boolean): DOM.Document {
+    return super.cloneNode(subtree) as DOM.Document;
+  }
+
   set nodeValue(_value: string | null) {
     // Ignored
   }

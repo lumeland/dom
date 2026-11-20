@@ -40,7 +40,7 @@ describe("Element children sync", () => {
     parent.innerHTML = "";
     expect(children.length).toBe(0);
 
-    parent.appendChild(doc.createComment());
+    parent.appendChild(doc.createComment(""));
     expect(children.length).toBe(0);
 
     parent.appendChild(doc.createElement("p"));

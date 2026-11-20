@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { DOMParser, Element } from "../mod.ts";
+import { DOMParser } from "../mod.ts";
 
 describe("Replace node", () => {
   it("Node.replaceWith(childNode) correctly sets new childNode's parent", () => {
@@ -18,6 +18,6 @@ describe("Replace node", () => {
     const grandchild = doc.querySelector("#grandchild")!;
 
     child.replaceWith(grandchild);
-    expect((grandchild.parentNode as Element).id).toBe("parent");
+    expect((grandchild.parentNode as DOM.Element).id).toBe("parent");
   });
 });

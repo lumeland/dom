@@ -32,7 +32,7 @@ describe("getElementsBy", () => {
     expect(mainP).toBeTruthy();
     expect(articleP).toBeTruthy();
 
-    const imgParentArticle = (img!.parentElement! as Element).getElementsByTagName("article")[0];
+    const imgParentArticle = (img.parentElement as DOM.Element).getElementsByTagName("article")[0];
 
     expect(aside.tagName).toBe("ASIDE");
     expect(article.tagName).toBe("ARTICLE");
