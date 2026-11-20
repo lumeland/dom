@@ -8,6 +8,7 @@ const bench = new Bench();
 const code = readFileSync(fileURLToPath(import.meta.resolve("./code.html")), "utf-8");
 const parser = new DOMParser();
 const parsedCode = JSON.parse(parse(code));
+const document = parser.parseFromString(code, "text/html");
 
 bench.add("Only parse", () => {
   parse(code);
@@ -19,6 +20,18 @@ bench.add("Only deserialize", () => {
 
 bench.add("Full DOM parse", () => {
   parser.parseFromString(code, "text/html");
+});
+
+bench.add("Only stringify", () => {
+  if (document.documentElement.outerHTML === "") {
+    throw new Error("Empty content");
+  }
+});
+
+bench.add("Full DOM parse and stringify", () => {
+  if (parser.parseFromString(code, "text/html").documentElement.outerHTML === "") {
+    throw new Error("Empty content");
+  }
 });
 
 await bench.run();

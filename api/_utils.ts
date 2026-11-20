@@ -411,12 +411,8 @@ export function getOuterOrInnerHtml(parentElement: DOM.Element, asOuterHtml: boo
             case "iframe":
             case "noembed":
             case "noframes":
+            case "noscript":
             case "plaintext": {
-              innerHTML += (child as DOM.Text).data;
-              break;
-            }
-
-            case "noscript": {
               innerHTML += (child as DOM.Text).data;
               break;
             }
