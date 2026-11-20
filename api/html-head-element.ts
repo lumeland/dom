@@ -1,6 +1,12 @@
+import { $createClone } from "./_utils.ts";
+
 class HTMLHeadElementClass extends dom.HTMLElement {
   constructor() {
     super("HEAD");
+  }
+
+  [$createClone](): DOM.HTMLHeadElement {
+    return new dom.HTMLHeadElement();
   }
 }
 

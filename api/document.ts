@@ -57,7 +57,7 @@ export class DocumentClass extends dom.ParentNode {
   get all(): HTMLAllCollection {
     throw new Error("to-do");
   }
-  get anchors(): DOM.HTMLCollection<HTMLAnchorElement> {
+  get anchors(): DOM.HTMLCollection<DOM.HTMLAnchorElement> {
     throw new Error("to-do");
   }
   get applets(): DOM.HTMLCollection {
@@ -93,10 +93,10 @@ export class DocumentClass extends dom.ParentNode {
   get documentURI(): string {
     throw new Error("to-do");
   }
-  get embeds(): DOM.HTMLCollection<HTMLEmbedElement> {
+  get embeds(): DOM.HTMLCollection<DOM.HTMLEmbedElement> {
     throw new Error("to-do");
   }
-  get forms(): DOM.HTMLCollection<HTMLFormElement> {
+  get forms(): DOM.HTMLCollection<DOM.HTMLFormElement> {
     throw new Error("to-do");
   }
   get head(): DOM.HTMLHeadElement | null {
@@ -119,7 +119,7 @@ export class DocumentClass extends dom.ParentNode {
   get hidden(): boolean {
     throw new Error("to-do");
   }
-  get images(): DOM.HTMLCollection<HTMLImageElement> {
+  get images(): DOM.HTMLCollection<DOM.HTMLImageElement> {
     throw new Error("to-do");
   }
   get implementation(): DOM.DOMImplementation {
@@ -131,7 +131,7 @@ export class DocumentClass extends dom.ParentNode {
   get lastModified(): string {
     throw new Error("to-do");
   }
-  get links(): DOM.HTMLCollection<HTMLAnchorElement | HTMLAreaElement> {
+  get links(): DOM.HTMLCollection<DOM.HTMLAnchorElement> {
     throw new Error("to-do");
   }
   get location(): Location {
@@ -143,13 +143,13 @@ export class DocumentClass extends dom.ParentNode {
   get pictureInPictureEnabled(): boolean {
     throw new Error("to-do");
   }
-  get plugins(): DOM.HTMLCollection<HTMLEmbedElement> {
+  get plugins(): DOM.HTMLCollection<DOM.HTMLEmbedElement> {
     throw new Error("to-do");
   }
   get rootElement(): SVGSVGElement | null {
     throw new Error("to-do");
   }
-  get scripts(): DOM.HTMLCollection<HTMLScriptElement> {
+  get scripts(): DOM.HTMLCollection<DOM.HTMLScriptElement> {
     throw new Error("to-do");
   }
   createAttribute(_localName: string): DOM.Attr {
@@ -186,8 +186,32 @@ export class DocumentClass extends dom.ParentNode {
         return element;
       }
 
+      case "EMBED": {
+        const element = new dom.HTMLEmbedElement();
+        element[$ownerDocument] = this;
+        return element;
+      }
+
+      case "FORM": {
+        const element = new dom.HTMLFormElement();
+        element[$ownerDocument] = this;
+        return element;
+      }
+
       case "HEAD": {
         const element = new dom.HTMLHeadElement();
+        element[$ownerDocument] = this;
+        return element;
+      }
+
+      case "IMG": {
+        const element = new dom.HTMLImageElement();
+        element[$ownerDocument] = this;
+        return element;
+      }
+
+      case "SCRIPT": {
+        const element = new dom.HTMLScriptElement();
         element[$ownerDocument] = this;
         return element;
       }

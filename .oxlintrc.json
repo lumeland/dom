@@ -1,6 +1,7 @@
 {
   "ignorePatterns": ["api/dom/selectors/"],
   "options": {
-    "typeAware": true
+    "typeAware": true,
+    "typeCheck": true
   }
 }

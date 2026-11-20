@@ -2,7 +2,7 @@ import { $createClone } from "./_utils.ts";
 
 export class TextClass extends dom.CharacterData {
   constructor(text: string = "") {
-    super(String(text), "#text", dom.NodeType.TEXT_NODE);
+    super(text, "#text", dom.NodeType.TEXT_NODE);
   }
 
   [$createClone](): DOM.Text {

@@ -1,3 +1,5 @@
+import { $createClone } from "./_utils.ts";
+
 class DocumentTypeClass extends dom.Node {
   #qualifiedName: string;
   #publicId: string;
@@ -9,6 +11,10 @@ class DocumentTypeClass extends dom.Node {
     this.#qualifiedName = name;
     this.#publicId = publicId;
     this.#systemId = systemId;
+  }
+
+  [$createClone](): DOM.DocumentType {
+    return new dom.DocumentType(this.name, this.publicId, this.systemId);
   }
 
   get name(): string {
