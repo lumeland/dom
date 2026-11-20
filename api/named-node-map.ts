@@ -1,4 +1,4 @@
-import { $ownerElement, ArrayLike } from "./_utils.ts";
+import { $ownerElement, ArrayLike, svgAttributesAliases } from "./_utils.ts";
 
 class NamedNodeMapClass extends ArrayLike<DOM.Attr> {
   #ownerElement: DOM.Element | null = null;
@@ -15,6 +15,7 @@ class NamedNodeMapClass extends ArrayLike<DOM.Attr> {
   }
   getNamedItem(qualifiedName: string): DOM.Attr | null {
     qualifiedName = qualifiedName.toLowerCase();
+    qualifiedName = svgAttributesAliases.get(qualifiedName) ?? qualifiedName;
     return this.find((item) => item.name === qualifiedName) ?? null;
   }
   getNamedItemNS(_namespace: string | null, _localName: string): DOM.Attr | null {
