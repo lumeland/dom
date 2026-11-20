@@ -6,9 +6,8 @@
     "name": "Óscar Otero"
   },
   "files": [
-    "api",
-    "wasm",
-    "mod.ts"
+    "build",
+    "CHANGELOG.md"
   ],
   "type": "module",
   "exports": {
