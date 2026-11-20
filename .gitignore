@@ -4,4 +4,5 @@ node_modules
 /package
 /build
 /target
+/test/wpt
 TODO

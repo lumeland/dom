@@ -54,34 +54,38 @@ class HTMLScriptElementClass extends dom.HTMLElement {
     throw new Error("to-do");
   }
   get noModule(): boolean {
-    throw new Error("to-do");
+    return this.hasAttribute("nomodule");
   }
   set noModule(value: boolean) {
-    throw new Error("to-do");
+    if (value) {
+      this.setAttribute("nomodule", "");
+    } else {
+      this.removeAttribute("nomodule");
+    }
   }
   get referrerPolicy(): string {
-    throw new Error("to-do");
+    return this.getAttribute("referrerpolicy") ?? "no-referrer-when-downgrade";
   }
   set referrerPolicy(value: string) {
-    throw new Error("to-do");
+    this.setAttribute("referrerpolicy", value);
   }
   get src(): string {
-    throw new Error("to-do");
+    return this.getAttribute("src") ?? "";
   }
   set src(value: string) {
-    throw new Error("to-do");
+    this.setAttribute("src", value);
   }
   get text(): string {
-    throw new Error("to-do");
+    return this.textContent ?? "";
   }
   set text(value: string) {
-    throw new Error("to-do");
+    this.textContent = value;
   }
   get type(): string {
-    throw new Error("to-do");
+    return this.getAttribute("type") ?? "";
   }
   set type(value: string) {
-    throw new Error("to-do");
+    this.setAttribute("type", value);
   }
 }
 

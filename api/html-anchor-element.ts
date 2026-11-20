@@ -40,10 +40,10 @@ class HTMLAnchorElementClass extends dom.HTMLElement {
     throw new Error("to-do");
   }
   set href(value: string) {
-    throw new Error("to-do");
+    this.setAttribute("href", value);
   }
   get href(): string {
-    throw new Error("to-do");
+    return this.getAttribute("href") ?? "";
   }
   set password(value: string) {
     throw new Error("to-do");
