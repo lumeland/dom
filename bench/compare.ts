@@ -1,7 +1,7 @@
 import { Bench } from "tinybench";
 import { DOMParser } from "../mod.ts";
 import { DOMParser as DenoDom } from "@b-fuze/deno-dom";
-import { parse } from "parse5";
+import { parse, serialize } from "parse5";
 import { JSDOM } from "jsdom";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
@@ -12,19 +12,21 @@ const parser = new DOMParser();
 const denoDom = new DenoDom();
 
 bench.add("@lumeland/dom", () => {
-  parser.parseFromString(code, "text/html");
+  // oxlint-disable-next-line no-unused-expressions
+  parser.parseFromString(code, "text/html").documentElement?.innerHTML;
 });
 
 bench.add("@b-fuze/deno-dom", () => {
-  denoDom.parseFromString(code, "text/html");
+  // oxlint-disable-next-line no-unused-expressions
+  denoDom.parseFromString(code, "text/html").documentElement?.innerHTML;
 });
 
 bench.add("parse5", () => {
-  parse(code);
+  serialize(parse(code));
 });
 
 bench.add("jsdom", () => {
-  new JSDOM(code);
+  new JSDOM(code).serialize();
 });
 
 await bench.run();
