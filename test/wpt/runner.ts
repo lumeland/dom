@@ -8,15 +8,15 @@ const files = [
 for (const file of files) {
   const { tests } = (await runTest(file)) as any;
   console.log();
-  console.log(`FILE - ${file}`);
+  console.log(file);
 
   for (const test of tests) {
     if (test.status === 0) {
-      console.log(`PASS - ${test.name}`);
+      console.log(`- PASS: ${test.name}`);
       continue;
     }
 
-    console.log(`FAIL - ${test.name}`);
-    console.log(`       ${test.message}`);
+    console.log(`- FAIL: ${test.name}`);
+    console.log(`        ${test.message}`);
   }
 }

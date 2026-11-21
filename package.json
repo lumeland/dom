@@ -15,6 +15,7 @@
   },
   "scripts": {
     "test": "vitest run --no-isolate",
+    "test:wpt": "node test/wpt/runner.ts",
     "fmt": "oxfmt .",
     "build": "rm -rf package && pnpm build:wasm && tsc -p . && cp -r wasm build && pnpm pack --out=package.tgz && rm -rf build && tar -xzf package.tgz && rm package.tgz && node build.js && oxfmt package/*",
     "build:wasm": "wasm-pack build --target web --out-dir=wasm --no-pack",
