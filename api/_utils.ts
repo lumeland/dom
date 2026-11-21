@@ -359,6 +359,24 @@ export function getElementsByTagNameWildcard(
   return search;
 }
 
+export function getElementsByName(
+  nodeList: DOM.NodeList,
+  name: string,
+  search: DOM.HTMLCollection,
+): DOM.HTMLCollection {
+  for (const child of nodeList) {
+    if (isElement(child)) {
+      if (child.getAttribute("name") === name) {
+        search.push(child);
+      }
+
+      getElementsByName(child.childNodes, name, search);
+    }
+  }
+
+  return search;
+}
+
 export function getElementsByTagName(
   nodeList: DOM.NodeList,
   tagName: string,

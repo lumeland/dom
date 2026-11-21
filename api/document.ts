@@ -5,6 +5,7 @@ import {
   getElementsByTagName,
   getElementsByTagNameWildcard,
   $ownerDocument,
+  getElementsByName,
 } from "./_utils.ts";
 
 export class DocumentClass extends dom.ParentNode {
@@ -256,8 +257,8 @@ export class DocumentClass extends dom.ParentNode {
       new dom.HTMLCollection(),
     );
   }
-  getElementsByName(_elementName: string): DOM.NodeList<DOM.HTMLElement> {
-    throw new Error("to-do");
+  getElementsByName(elementName: string): DOM.HTMLCollection<DOM.Element> {
+    return getElementsByName(this.childNodes, elementName, new dom.HTMLCollection());
   }
   getElementsByTagName(qualifiedName: string): DOM.HTMLCollection<DOM.Element> {
     if (qualifiedName === "*") {
