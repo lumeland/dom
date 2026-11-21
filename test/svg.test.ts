@@ -8,7 +8,7 @@ describe("SVG code", () => {
     const svg = dom.querySelector("svg");
 
     expect(svg?.getAttribute("viewBox")).toBe("0.00 0.00 370.99 246.71");
-    expect(svg?.getAttribute("viewbox")).toBe("0.00 0.00 370.99 246.71");
+    expect(svg?.getAttribute("viewbox")).toBeNull();
     expect(svg?.outerHTML).toBe(
       `<svg width="371pt" height="247pt" viewBox="0.00 0.00 370.99 246.71"></svg>`,
     );

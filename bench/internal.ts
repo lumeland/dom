@@ -36,5 +36,4 @@ bench.add("Full DOM parse and stringify", () => {
 
 await bench.run();
 
-console.log(bench.name);
 console.table(bench.table());

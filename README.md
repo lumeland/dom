@@ -8,6 +8,7 @@ This is a port of the [original project](https://github.com/b-fuze/deno-dom) cre
 - Ported to Node.js.
 - Updated Rust libraries
 - Refactor of the DOM implementation with cleaner code and more support.
+- Initial support for SVG.
 - Replaced `nwsapi` with `css-select`
 - Removed FFI version and provide a single WASM version.
 

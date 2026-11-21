@@ -26,6 +26,7 @@ await import("./api/html-head-element.ts");
 await import("./api/html-image-element.ts");
 await import("./api/html-script-element.ts");
 await import("./api/html-template-element.ts");
+await import("./api/svg-element.ts");
 await import("./api/document.ts");
 await import("./api/document-type.ts");
 await import("./api/dom-implementation.ts");

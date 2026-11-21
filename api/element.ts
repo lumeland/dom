@@ -14,6 +14,7 @@ import {
   $className,
   reactive,
   matches,
+  $normalizeAttr,
 } from "./_utils.ts";
 
 class ElementClass extends dom.ParentNode {
@@ -50,6 +51,10 @@ class ElementClass extends dom.ParentNode {
 
   [$createClone](): DOM.Element {
     return new dom.Element(this.tagName);
+  }
+
+  [$normalizeAttr](name: string): string {
+    return name.toLowerCase();
   }
 
   cloneNode(subtree?: boolean): DOM.Element {
@@ -105,7 +110,6 @@ class ElementClass extends dom.ParentNode {
   get nodeValue() {
     return null;
   }
-  // to-do: implement other namespaces
   get namespaceURI(): string | null {
     return "http://www.w3.org/1999/xhtml";
   }
@@ -198,6 +202,7 @@ class ElementClass extends dom.ParentNode {
     return null;
   }
   getAttribute(qualifiedName: string): string | null {
+    qualifiedName = this[$normalizeAttr](qualifiedName);
     return this.#attributes?.getNamedItem(qualifiedName)?.value ?? null;
   }
   getAttributeNS(_namespace: string | null, _localName: string): string | null {
@@ -241,6 +246,7 @@ class ElementClass extends dom.ParentNode {
     throw new Error("to-do");
   }
   hasAttribute(qualifiedName: string): boolean {
+    qualifiedName = this[$normalizeAttr](qualifiedName);
     return !!this.#attributes?.getNamedItem(qualifiedName);
   }
   hasAttributeNS(_namespace: string | null, _localName: string): boolean {
@@ -262,6 +268,7 @@ class ElementClass extends dom.ParentNode {
     return matches(selectors, this);
   }
   removeAttribute(qualifiedName: string): void {
+    qualifiedName = this[$normalizeAttr](qualifiedName);
     if (this.hasAttribute(qualifiedName)) {
       this.attributes.removeNamedItem(qualifiedName);
     }
@@ -279,6 +286,7 @@ class ElementClass extends dom.ParentNode {
     return attr;
   }
   setAttribute(qualifiedName: string, value: string): void {
+    qualifiedName = this[$normalizeAttr](qualifiedName);
     const existing = this.attributes.getNamedItem(qualifiedName);
 
     if (existing) {
@@ -306,6 +314,7 @@ class ElementClass extends dom.ParentNode {
     throw new Error("to-do");
   }
   toggleAttribute(qualifiedName: string, force?: boolean): boolean {
+    qualifiedName = this[$normalizeAttr](qualifiedName);
     const existing = this.attributes.getNamedItem(qualifiedName);
 
     if (force === true) {

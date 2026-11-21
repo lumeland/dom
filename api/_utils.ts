@@ -10,6 +10,7 @@ export const $ownerElement = Symbol.for("ownerElement");
 export const $classList = Symbol.for("classList");
 export const $onChange = Symbol.for("onChange");
 export const $className = Symbol.for("className");
+export const $normalizeAttr = Symbol.for("normalizeAttr");
 
 wasm.initSync({
   module: readFileSync(new URL(import.meta.resolve("../wasm/dom_wasm_bg.wasm"))),
@@ -100,140 +101,6 @@ export function matches(query: string, element: DOM.Element) {
   }
 }
 
-export const svgAttributesAliases = new Map([
-  ["accentheight", "accentHeight"],
-  ["alignmentbaseline", "alignmentBaseline"],
-  ["allowreorder", "allowReorder"],
-  ["arabicform", "arabicForm"],
-  ["attributename", "attributeName"],
-  ["attributetype", "attributeType"],
-  ["autoreverse", "autoReverse"],
-  ["basefrequency", "baseFrequency"],
-  ["baseprofile", "baseProfile"],
-  ["baselineshift", "baselineShift"],
-  ["calcmode", "calcMode"],
-  ["capheight", "capHeight"],
-  ["clippath", "clipPath"],
-  ["clippathunits", "clipPathUnits"],
-  ["colorinterpolation", "colorInterpolation"],
-  ["colorinterpolationfilters", "colorInterpolationFilters"],
-  ["colorprofile", "colorProfile"],
-  ["colorrendering", "colorRendering"],
-  ["contentscripttype", "contentScriptType"],
-  ["contentstyletype", "contentStyleType"],
-  ["dominantbaseline", "dominantBaseline"],
-  ["enablebackground", "enableBackground"],
-  ["externalresourcesrequired", "externalResourcesRequired"],
-  ["fillopacity", "fillOpacity"],
-  ["fillrule", "fillRule"],
-  ["filterres", "filterRes"],
-  ["filterunits", "filterUnits"],
-  ["floodcolor", "floodColor"],
-  ["floodopacity", "floodOpacity"],
-  ["fontfamily", "fontFamily"],
-  ["fontsize", "fontSize"],
-  ["fontsizeadjust", "fontSizeAdjust"],
-  ["fontstretch", "fontStretch"],
-  ["fontstyle", "fontStyle"],
-  ["fontvariant", "fontVariant"],
-  ["fontweight", "fontWeight"],
-  ["glyphname", "glyphName"],
-  ["glyphorientationhorizontal", "glyphOrientationHorizontal"],
-  ["glyphorientationvertical", "glyphOrientationVertical"],
-  ["glyphref", "glyphRef"],
-  ["gradienttransform", "gradientTransform"],
-  ["gradientunits", "gradientUnits"],
-  ["horizadvx", "horizAdvX"],
-  ["horizoriginx", "horizOriginX"],
-  ["imagerendering", "imageRendering"],
-  ["keypoints", "keyPoints"],
-  ["keysplines", "keySplines"],
-  ["keytimes", "keyTimes"],
-  ["lengthadjust", "lengthAdjust"],
-  ["letterspacing", "letterSpacing"],
-  ["lightingcolor", "lightingColor"],
-  ["limitingconeangle", "limitingConeAngle"],
-  ["markerend", "markerEnd"],
-  ["markerheight", "markerHeight"],
-  ["markermid", "markerMid"],
-  ["markerstart", "markerStart"],
-  ["markerunits", "markerUnits"],
-  ["markerwidth", "markerWidth"],
-  ["maskcontentunits", "maskContentUnits"],
-  ["maskunits", "maskUnits"],
-  ["numoctaves", "numOctaves"],
-  ["overlineposition", "overlinePosition"],
-  ["overlinethickness", "overlineThickness"],
-  ["paintorder", "paintOrder"],
-  ["pathlength", "pathLength"],
-  ["patterncontentunits", "patternContentUnits"],
-  ["patterntransform", "patternTransform"],
-  ["patternunits", "patternUnits"],
-  ["pointerevents", "pointerEvents"],
-  ["pointsatx", "pointsAtX"],
-  ["pointsaty", "pointsAtY"],
-  ["pointsatz", "pointsAtZ"],
-  ["preservealpha", "preserveAlpha"],
-  ["preserveaspectratio", "preserveAspectRatio"],
-  ["primitiveunits", "primitiveUnits"],
-  ["refx", "refX"],
-  ["refy", "refY"],
-  ["renderingintent", "renderingIntent"],
-  ["repeatcount", "repeatCount"],
-  ["repeatdur", "repeatDur"],
-  ["requiredextensions", "requiredExtensions"],
-  ["requiredfeatures", "requiredFeatures"],
-  ["shaperendering", "shapeRendering"],
-  ["stopcolor", "stopColor"],
-  ["stopopacity", "stopOpacity"],
-  ["strikethroughposition", "strikethroughPosition"],
-  ["strikethroughthickness", "strikethroughThickness"],
-  ["strokedasharray", "strokeDasharray"],
-  ["strokedashoffset", "strokeDashoffset"],
-  ["strokelinecap", "strokeLinecap"],
-  ["strokelinejoin", "strokeLinejoin"],
-  ["strokemiterlimit", "strokeMiterlimit"],
-  ["strokeopacity", "strokeOpacity"],
-  ["strokewidth", "strokeWidth"],
-  ["surfacescale", "surfaceScale"],
-  ["systemlanguage", "systemLanguage"],
-  ["textanchor", "textAnchor"],
-  ["textdecoration", "textDecoration"],
-  ["textrendering", "textRendering"],
-  ["transformorigin", "transformOrigin"],
-  ["underlineposition", "underlinePosition"],
-  ["underlinethickness", "underlineThickness"],
-  ["unicodebidi", "unicodeBidi"],
-  ["unicoderange", "unicodeRange"],
-  ["unitsperem", "unitsPerEm"],
-  ["valphabetic", "vAlphabetic"],
-  ["vhanging", "vHanging"],
-  ["videographic", "vIdeographic"],
-  ["vmathematical", "vMathematical"],
-  ["vectoreffect", "vectorEffect"],
-  ["vertadvy", "vertAdvY"],
-  ["vertoriginx", "vertOriginX"],
-  ["vertoriginy", "vertOriginY"],
-  ["viewbox", "viewBox"],
-  ["viewtarget", "viewTarget"],
-  ["wordspacing", "wordSpacing"],
-  ["writingmode", "writingMode"],
-  ["xchannelselector", "xChannelSelector"],
-  ["xheight", "xHeight"],
-  ["xlinkactuate", "xlinkActuate"],
-  ["xlinkarcrole", "xlinkArcrole"],
-  ["xlinkhref", "xlinkHref"],
-  ["xlinkrole", "xlinkRole"],
-  ["xlinkshow", "xlinkShow"],
-  ["xlinktitle", "xlinkTitle"],
-  ["xlinktype", "xlinkType"],
-  ["xmlbase", "xmlBase"],
-  ["xmllang", "xmlLang"],
-  ["xmlspace", "xmlSpace"],
-  ["ychannelselector", "yChannelSelector"],
-  ["zoomandpan", "zoomAndPan"],
-]);
-
 const voidElements = new Set([
   "area",
   "base",
@@ -280,13 +147,26 @@ type HTMLTemplateElementData = [
 ];
 type Data = DocumentOrElementData | TextOrCommentData | DocumentData | HTMLTemplateElementData;
 
+const namespaces = {
+  html: "http://www.w3.org/1999/xhtml",
+  svg: "http://www.w3.org/2000/svg",
+};
+
 export function arrayToNode(
   data: DocumentOrElementData | HTMLTemplateElementData,
   ownerDocument: DOM.Document,
+  namespace: keyof typeof namespaces = "html",
 ): DOM.Node {
   const [, nodeName, attributes, ...children] = data;
 
-  const element = ownerDocument.createElement(nodeName);
+  if (nodeName === "svg") {
+    namespace = "svg";
+  }
+
+  const element =
+    namespace === "html"
+      ? ownerDocument.createElement(nodeName)
+      : ownerDocument.createElementNS(namespaces[namespace], nodeName);
 
   if (attributes.length) {
     element.attributes.push(
@@ -331,7 +211,7 @@ export function arrayToNode(
 
       case dom.NodeType.DOCUMENT_NODE:
       case dom.NodeType.ELEMENT_NODE:
-        const elementChild = arrayToNode(child, ownerDocument);
+        const elementChild = arrayToNode(child, ownerDocument, namespace);
         childNodes.push(elementChild);
         elementChild[$parentNode] = element;
         break;

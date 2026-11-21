@@ -31,5 +31,4 @@ bench.add("jsdom", () => {
 
 await bench.run();
 
-console.log(bench.name);
 console.table(bench.table());

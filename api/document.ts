@@ -224,11 +224,22 @@ export class DocumentClass extends dom.ParentNode {
     }
   }
   createElementNS(
-    _namespace: string | null,
-    _qualifiedName: string,
+    namespace: string | null,
+    qualifiedName: string,
     _options?: string | ElementCreationOptions,
   ): DOM.Element {
-    throw new Error("to-do");
+    switch (namespace) {
+      case "http://www.w3.org/1999/xhtml":
+        return this.createElement(qualifiedName);
+
+      case "http://www.w3.org/2000/svg": {
+        const element = new dom.SVGElement(qualifiedName);
+        element[$ownerDocument] = this;
+        return element;
+      }
+      default:
+        throw new DOMException("Not supported namespace");
+    }
   }
   createTextNode(data: string): DOM.Text {
     const node = new dom.Text(data);
