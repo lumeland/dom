@@ -407,14 +407,13 @@ class ElementClass extends dom.ParentNode {
     this[$parentNode] = null;
 
     for (const node of allNodes) {
-      node[$parentNode] = parentNode;
-
       if (node !== this) {
         const oldSiblings = node.parentNode?.childNodes;
         if (oldSiblings) {
           oldSiblings.splice(oldSiblings.indexOf(node), 1);
         }
       }
+      node[$parentNode] = parentNode;
     }
 
     thisSiblings.splice(thisSiblings.indexOf(this), 1, ...allNodes);
