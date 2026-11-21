@@ -1,5 +1,5 @@
 {
-  "ignorePatterns": ["api/dom/selectors/"],
+  "ignorePatterns": ["wpt/**", "test/wpt/**"],
   "options": {
     "typeAware": true,
     "typeCheck": true

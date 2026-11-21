@@ -3593,7 +3593,7 @@ policies and contribution forms [3].
     // large test suites (tens of thousands of tests).
     function escape_html(s) {
       return s
-        .replace(/\&/g, "&amp;")
+        .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
         .replace(/"/g, "&quot;")
         .replace(/'/g, "&#39;");
@@ -3855,7 +3855,7 @@ policies and contribution forms [3].
     // in case it contains RegExp characters.
     var script_url = get_script_url();
     var re_text = script_url
-      ? script_url.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&")
+      ? script_url.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&")
       : "\\btestharness.js";
     var re = new RegExp(re_text + ":\\d+:\\d+");
 
