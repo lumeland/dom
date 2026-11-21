@@ -1,22 +1,22 @@
+import { glob } from "node:fs/promises";
 import { runTest } from "./wpt.ts";
 
-const files = [
-  "wpt/html/dom/documents/dom-tree-accessors/document.getElementsByName/document.getElementsByName-case-xhtml.xhtml",
-  "wpt/html/dom/documents/dom-tree-accessors/document.getElementsByClassName-same.html",
-];
+const patterns = ["wpt/html/dom/documents/dom-tree-accessors/document.getElementsByName/*.xhtml"];
 
-for (const file of files) {
-  const { tests } = (await runTest(file)) as any;
-  console.log();
-  console.log(file);
+for (const pattern of patterns) {
+  for await (const file of glob(pattern)) {
+    const { tests } = (await runTest(file)) as any;
+    console.log();
+    console.log(file);
 
-  for (const test of tests) {
-    if (test.status === 0) {
-      console.log(`- PASS: ${test.name}`);
-      continue;
+    for (const test of tests) {
+      if (test.status === 0) {
+        console.log(`- PASS`);
+        continue;
+      }
+
+      console.log(`- FAIL: ${test.name}`);
+      console.log(`        ${test.message}`);
     }
-
-    console.log(`- FAIL: ${test.name}`);
-    console.log(`        ${test.message}`);
   }
 }

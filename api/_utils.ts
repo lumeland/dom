@@ -370,7 +370,9 @@ export function getElementsByName(
         search.push(child);
       }
 
-      getElementsByName(child.childNodes, name, search);
+      if (child.tagName !== "SVG") {
+        getElementsByName(child.childNodes, name, search);
+      }
     }
   }
 
